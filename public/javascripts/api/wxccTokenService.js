@@ -76,11 +76,12 @@ const getWXRefreshToken = async () => {
   
 const getWXToken = async () => {
   // Gets the Access Token from the database. This is not per org (yet). Can be extended if needed.
-  const token = wxToken.findOne({
-    where: {
-      id: 1,
-    },
-  });
+  const token = await wxToken.findAll();
+  //   {
+  //   where: {
+  //     id: 1,
+  //   },
+  // });
 
   if (token) return token;
   else return {};
@@ -108,7 +109,7 @@ const updateWXToken = async (token) => {
 const getWXAccessToken = async () => {
   // Fetches the latest access Token if present in the database, else, it returns nothing.
   const token = await getWXToken();
-  let access_token = (await token.access_token) ? token.access_token : '';
+  let access_token = (await token[0].dataValues.access_token);
   logger.debug(`Returning WX Access Token: ${access_token}`);
   return { access_token };
 };

@@ -40,7 +40,7 @@ const wxAgents = db.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    createOn: {
+    documentumid: {
       type: DataTypes.STRING,
       allowNull: true,
     },

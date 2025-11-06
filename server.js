@@ -22,6 +22,8 @@ global.WXCLIENT_ORGID = process.env["npm_config_wxcc_orgid"] || process.env["wxc
 global.CACLIENT_ID = process.env["npm_config_calsaws_client_id"] || process.env["calsaws_client_id"] || null;
 global.CACLIENT_SECRET = process.env["npm_config_calsaws_client_secret"] || process.env["calsaws_client_secret"] || null;
 global.CACLIENT_SCOPE = process.env["npm_config_calsaws_client_scope"] || process.env["calsaws_client_scope"] || null;
+global.CACASEURL = process.env["npm_config_cacaseurl"] || process.env["cacaseurl"] || null;
+global.CASTOREURL= process.env["npm_config_castoreurl"] || process.env["castoreurl"] || null;
 global.LOG_LEVEL = process.env["npm_config_log_level"] || process.env["log_level"] || "info";
 global.WEBHOOK_PATH = "/webhook/webhook";
 global.WEBHOOK_URL = process.env["npm_config_webhook_url"] || process.env["webhook_url"] || null;
@@ -68,6 +70,16 @@ process.on('uncaughtException', function(error){
     logger.error("CACLIENT_SCOPE not defined in npm config or environment.  Cannot run.");
     process.exit(-1);
   }
+  if (CACASEURL == null) {
+    logger.error("CACASEURL not defined in npm config or environment.  Cannot run.");
+    process.exit(-1);
+  }
+    if (CASTOREURL == null) {
+    logger.error("CASTOREURL not defined in npm config or environment.  Cannot run.");
+    process.exit(-1);
+  }
+
+
   logger.level = LOG_LEVEL;
 
   logger.info("LOG_LEVEL -" +  LOG_LEVEL);

@@ -47,19 +47,21 @@ router.post('/pauseResume', async (req, res) => {
         logger.debug(`Full metadata: ${JSON.stringify(metadata)}`);
 
         // Update database with the call metadata
-        const dbResult = updateAgentDatabase({
-            taskId: taskId,
-            callData: metadata.callData,
-            timestamp: metadata.timestamp,
-            caseNumber: metadata.caseNumber
-        });
+        const dbResult = await updateAgentDatabase({metadata});
 
         logger.debug(`Database update result: ${JSON.stringify(dbResult)}`);
+        if (!dbResult){
+            return res.status(400).json({
+            success: false,
+            error: 'Database update Failed for taskid - '+ taskId
+        });
+        }
 
         // Send pause/resume commands to Webex
-        const pauseResumeResult = await sendPauseResume(taskId);
+        var sendResponse = await sendPauseResume(taskId)
+  
         
-        if (pauseResumeResult === false) {
+        if (!sendResponse) {
             logger.error(`Failed to send pause/resume for taskId: ${taskId}`);
             return res.status(500).json({
                 success: false,
@@ -67,7 +69,7 @@ router.post('/pauseResume', async (req, res) => {
             });
         }
 
-        logger.info(`Successfully processed TS request for taskId: ${taskId}`);
+        logger.info(`Successfully sent pause /resume request for taskId: ${taskId}`);
 
         // Return success response
         return res.status(200).json({

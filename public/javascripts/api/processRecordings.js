@@ -1,58 +1,88 @@
 const axios = require("axios");
 const { getWXAccessToken } = require('./wxccTokenService.js')
-const {getMetadata} =  require('../db/agentsDb.js')
+const { getMetadata } = require('../db/agentsDb.js')
+const { updateADocumentId } = require('../db/agentsDb.js');
 
 const { getCAToken } = require('./caTokenService.js')
 const fs = require('fs');
 const path = require('path');
 const ffmpeg = require('fluent-ffmpeg');
 const FormData = require('form-data');
-var logger=require('../../../log.js');
+var logger = require('../../../log.js');
 var curModual = " - processRecordings.js - "
 
 //download file from Webex
 const proccessRecording = async (payload) => {
 
-  logger.debug('  - get Capture WAV...');
-  let [wavUrl,fileName] = await getCapture(payload)
+  try {
+    // Retrive metadate for taskId from database
+    logger.debug('  - Get metaData from Db for taskId - ' + payload.data.taskId + '...');
+    let metaData = await getDbMetadata(payload.data.taskId)
+    if (metaData === null) {
+      logger.info("metadata not found for taksId " + payload.data.taskId)
+      return false;
+    }
 
-  if (wavUrl === undefined || wavURL === null)  {
-    return 
-  }
+    //Get capture data for taks ID
+    logger.debug('  - get Capture WAV...');
+    let [wavUrl, fileName] = await getCapture(payload)
 
-  const wavPath = path.join(__dirname, '../../../recordingWav/' + fileName)
-  logger.info('Downloading WAV', { fileName, destination: wavPath });
-  await downloadFile(wavUrl, wavPath);
+    if (wavUrl === undefined || wavUrl === null) {
+      return
+    }
 
-      // Verify file exists after download
-  if (fs.existsSync(wavPath)) {
+    //Download wav file from Webex
+    const wavPath = path.join(__dirname, '../../../recordingWav/' + fileName)
+    logger.info('Downloading WAV', { fileName, destination: wavPath });
+    await downloadFile(wavUrl, wavPath);
+
+    // Verify file exists after download
+    if (fs.existsSync(wavPath)) {
       const stats = fs.statSync(wavPath);
       logger.info('WAV file downloaded successfully', {
         path: wavPath,
         size: stats.size,
         exists: true
       });
-  } else {
+    } else {
       logger.error('WAV file does not exist after download!', { path: wavPath });
       throw new Error('Downloaded file not found');
+    }
+
+    // Convert to MPe
+    const mp3Path = path.join(__dirname, '../../../recordingMP3/' + fileName)
+    logger.debug('  - Converting to MP3...');
+    await convertWavToMp3(wavPath, mp3Path);
+
+
+    //Retruve caseUUID from CalkSaws
+    logger.debug('  - Get case UUID from CalSaws for taskId - ' + metaData.dataValues.caseNumber + '...');
+    let caseUUID = await getCaseUUID(metaData.dataValues.caseNumber)
+    if (caseUUID === null || caseUUID == "") {
+      logger.debug("No UUID for caseNumber " + etaData.dataValues.caseNumber)
+      return false
+    }
+
+    //Upoad metadate and file to CalSAWS
+    logger.debug('  - Uploading MP3...');
+
+    let documentumId = await uploadFile(mp3Path, metaData.dataValues.caseNumber, caseUUID);
+    logger.debug('  - Done!');
+
+    //Update Database with documentum ID
+    const dbResult = await updateADocumentId({taskId: payload.data.taskId , documentumid: documentumId.id});
+    if (dbResult){
+      logger.debug("Database updated with document number - " + documentumId)
+    }else{
+      logger.debug("Upload succsfull but DB update failed")
+    }
+
+    fs.unlinkSync(wavPath);
+    fs.unlinkSync(mp3Path);
+
+  } catch (error) {
+    logger.debug(error.message);
   }
-
-  const mp3Path = path.join(__dirname, '../../../recordingMP3/' + fileName )
-  logger.debug('  - Converting to MP3...');
-  await convertWavToMp3(wavPath, mp3Path);
-
-  logger.debug('  - Get metaData from Db for taskId - ' + payload.data.taskId + '...');
-  let metaData = await getDbMetadata(payload.data.taskId)
-
-  logger.debug('  - Get case UUID from CalSaws for taskId - ' + metaData.dataValues.caseNumber + '...');
-  let caseUUID = await await getCaseUUID(metaData.dataValues.caseNumber)
-
-  logger.debug('  - Uploading MP3...');
-  await uploadFile(mp3Path, metaData, caseUUID);
-  logger.debug('  - Done!');
-
-  fs.unlinkSync(wavPath);
-  fs.unlinkSync(mp3Path);
 
 }
 
@@ -126,13 +156,13 @@ async function getCapture(payload) {
         fileName: r.attributes?.fileName
       }))
     });
-  await axios.request(config)
-  .then((response) => {
-    console.log(JSON.stringify(response.data));
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+    await axios.request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     const segmentRecordings = recordings.filter(rec => rec.segment === true);
 
     logger.info('Filtered segment recordings', {
@@ -141,12 +171,12 @@ async function getCapture(payload) {
     });
 
     // Verify there are exactly 3 segment recordings
-    if (segmentRecordings.length !== 3) {
+    if (segmentRecordings.length < 3) {
       logger.error('Invalid number of segment recordings', {
         expected: 3,
         actual: segmentRecordings.length
       });
-      throw new Error(`Expected 3 segment recordings, but found ${segmentRecordings.length}`);
+      throw new Error(`Expected at least 3 segment recordings, but found ${segmentRecordings.length}`);
     }
 
     // Process only the SECOND recording (index 1)
@@ -162,8 +192,8 @@ async function getCapture(payload) {
       startTime: recording.attributes.startTime,
       stopTime: recording.attributes.stopTime
     });
-    return [wavUrl,fileName];
-    
+    return [wavUrl, fileName];
+
   } catch (error) {
     logger.error('Error processing recording', {
       fileName: fileName,
@@ -181,8 +211,8 @@ async function getCapture(payload) {
 
 
 async function downloadFile(url, outputPath) {
-logger.info('Starting download', { url, outputPath });
-  
+  logger.info('Starting download', { url, outputPath });
+
   try {
     const response = await axios({
       method: 'GET',
@@ -191,27 +221,27 @@ logger.info('Starting download', { url, outputPath });
       timeout: 30000, // 30 second timeout
       maxRedirects: 5
     });
-    
+
     logger.info('Download response received', {
       status: response.status,
       statusText: response.statusText,
       contentType: response.headers['content-type'],
       contentLength: response.headers['content-length']
     });
-    
+
     const writer = fs.createWriteStream(outputPath);
-    
+
     // Track progress
     let downloadedBytes = 0;
     response.data.on('data', (chunk) => {
       downloadedBytes += chunk.length;
     });
-    
+
     response.data.pipe(writer);
-    
+
     return new Promise((resolve, reject) => {
       writer.on('finish', () => {
-        logger.info('Download completed', { 
+        logger.info('Download completed', {
           outputPath,
           downloadedBytes,
           fileExists: fs.existsSync(outputPath),
@@ -219,24 +249,24 @@ logger.info('Starting download', { url, outputPath });
         });
         resolve();
       });
-      
+
       writer.on('error', (err) => {
-        logger.error('Writer error', { 
+        logger.error('Writer error', {
           error: err.message,
-          outputPath 
+          outputPath
         });
         reject(err);
       });
-      
+
       response.data.on('error', (err) => {
-        logger.error('Stream error', { 
+        logger.error('Stream error', {
           error: err.message,
-          url 
+          url
         });
         reject(err);
       });
     });
-    
+
   } catch (error) {
     logger.error('Download failed', {
       error: error.message,
@@ -271,8 +301,8 @@ async function getCaseUUID(caseNumber) {
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://capi.calsaws.net/imaging-service/inbound/case',
-    headers: { 
+    url: CACASEURL,
+    headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': "Bearer " + accessToken.dataValues.access_token
@@ -284,24 +314,24 @@ async function getCaseUUID(caseNumber) {
       userName: "CalSAWSServiceAcct"
     }
   };
-  
+
   try {
-    logger.info('Getting case UUID', { caseNumber});
-    logger.debug('Request config', { 
+    logger.info('Getting case UUID', { caseNumber });
+    logger.debug('Request config', {
       url: config.url,
       headers: config.headers,
       data: config.data // Log the object, not stringified
     });
     // Use retry logic - retry up to 3 times with exponential backoff
     const response = await axios(config);
-    
+
     logger.info('Case UUID retrieved successfully', {
       caseNumber: caseNumber,
       caseUID: response.data?.caseUID
     });
-    
+
     return response.data?.caseUID;
-    
+
   } catch (error) {
     logger.error('Failed to get case UUID after retries', {
       caseNumber: caseNumber,
@@ -310,7 +340,7 @@ async function getCaseUUID(caseNumber) {
       statusText: error.response?.statusText,
       responseData: error.response?.data
     });
-    
+
     // Handle specific error codes
     if (error.response?.status === 503) {
       throw new Error('CalSAWS service is temporarily unavailable. Please try again later.');
@@ -319,7 +349,7 @@ async function getCaseUUID(caseNumber) {
     } else if (error.response?.status >= 400 && error.response?.status < 500) {
       throw new Error(`Invalid request: ${error.response?.data?.message || error.message}`);
     }
-    
+
     throw error;
   }
 
@@ -328,9 +358,9 @@ async function getCaseUUID(caseNumber) {
 async function uploadFile(filePath, caseNumber, caseUUID) {
   const FormData = require('form-data');
   const form = new FormData();
-  
+
   const accessToken = await getCAToken();
-  
+
   // Build the info JSON structure
   const infoData = {
     keys: {
@@ -366,24 +396,24 @@ async function uploadFile(filePath, caseNumber, caseUUID) {
       ]
     }
   };
-  
+
   // Append info as JSON string
   form.append('info', JSON.stringify(infoData));
-  
+
   // Append the file
   form.append('file', fs.createReadStream(filePath));
-  
+
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: 'https://capi.calsaws.net/image/store', // Replace with actual host
+    url: CASTOREURL, // Replace with actual host
     headers: {
       'Authorization': "Bearer " + accessToken.dataValues.access_token,
       ...form.getHeaders()
     },
     data: form
   };
-  
+
   try {
     logger.info('Uploading file to CalSAWS', {
       filePath: filePath,
@@ -391,16 +421,17 @@ async function uploadFile(filePath, caseNumber, caseUUID) {
       countyCode: "19",
       url: config.url
     });
-    
+
     const response = await axios.request(config);
-    
+
     logger.info('File uploaded successfully', {
       status: response.status,
       data: response.data
     });
-    
+
+
     return response.data;
-    
+
   } catch (error) {
     logger.error('File upload failed', {
       error: error.message,
@@ -408,7 +439,7 @@ async function uploadFile(filePath, caseNumber, caseUUID) {
       statusText: error.response?.statusText,
       responseData: error.response?.data
     });
-    
+
     throw error;
   }
 }

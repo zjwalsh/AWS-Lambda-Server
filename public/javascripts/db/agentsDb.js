@@ -1,6 +1,6 @@
-const { db } = require('./db');
-const { sequelize } = require('sequelize');
-const Op = require('sequelize').Op;
+//const { db } = require('./db');
+//const { sequelize } = require('sequelize');
+//const Op = require('sequelize').Op;
 var logger = require('../../../log.js');
 
 /**
@@ -47,26 +47,48 @@ const getMetadata = async (taskId) => {
 const updateAgentDatabase = async (payload) => {
 
   try{
+
       //Query for agent by ID
-      const record = await wxAgents.update(
+      await wxAgents.upsert(
           {
-            taskId: payload.taskId,
-            program: payload.program,
-            appNumber: payload.appNumber,
-            caseNumber: payload.casenumber,
-            firstName: payload.firstName,
-            lastName: payload.lastName,
-            formId: payload.proccess,
-            formName: payload.formId
+            taskId: payload.metadata.taskId,
+            program: payload.metadata.program,
+            appNumber: payload.metadata.appNumber,
+            caseNumber: payload.metadata.caseNumber,
+            firstName: payload.metadata.firstName,
+            lastName: payload.metadata.lastName,
+            formId: payload.metadata.process,
+            formName: payload.metadata.formId,
           },
 
           { returning: true }
         );
         logger.debug('Agent record Done: ' + payload.taskId);
+        return true
   }catch(error){
     logger.error("Error Updateing database - " + JSON.stringify(error.message));
     return false
   }
 };
 
-module.exports = {updateAgentDatabase, getMetadata};
+const updateADocumentId= async (payload) => {
+
+  try{
+      //Query for agent by ID
+      await wxAgents.update(
+
+        { documentumid: payload.documentumid },
+        { 
+          where: { taskId: payload.taskId },
+          returning: true 
+        }
+      );
+      logger.debug('Agent record Done: ' + payload.taskId);
+      return true
+  }catch(error){
+    logger.error("Error Updateing database - " + JSON.stringify(error.message));
+    return false
+  }
+};
+
+module.exports = {updateAgentDatabase, getMetadata, updateADocumentId};

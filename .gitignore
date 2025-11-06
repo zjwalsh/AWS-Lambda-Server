@@ -1,0 +1,4 @@
+logs/*.log
+lacts.db
+node_modules/
+

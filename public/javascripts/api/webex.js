@@ -14,6 +14,7 @@ var curModual = " - api.js - "
  * @returns {string}
  */
 const sendPauseResume = async (taskId) => {
+  try{
     logger.info(curModual + "sendPauseResume - Sending Pause/Resume Command to WebEx for taskId " + taskId);
     const accessToken = await getWXAccessToken();
     if (accessToken == null) {
@@ -31,25 +32,33 @@ const sendPauseResume = async (taskId) => {
         'Content-Type': 'application/json'
       }
     };
-    let url = 'https://api.wxcc-us1.cisco.com/v2/telephony/tasks/' + taskId + '/record/pause';
-    await axios.request(url,config)
-    .then((response) => {
-      logger.debug(JSON.stringify(response.data));
-    })
-    .catch((error) => {
-      logger.debug(error);
+
+    // Send the Pause command
+    let url = 'https://api.wxcc-us1.cisco.com/v1/tasks/' + taskId + '/record/pause';
+    try {
+      const pauseResponse = await axios.request(url, config);
+      logger.debug("Webex Response to Pause: " + JSON.stringify(pauseResponse.data));
+    } catch (error) {
+      logger.debug("Pause returned error: " + error.message);
       return false;
-    });
-    url = 'https://api.wxcc-us1.cisco.com/v2/telephony/tasks/' + taskId + '/record/resum';
-    await axios.request(url,config)
-    .then((response) => {
-      logger.debug(JSON.stringify(response.data));
-      return true;
-    })
-    .catch((error) => {
-      logger.debug(error);
+    }
+
+    //Send the Resume command
+    url = 'https://api.wxcc-us1.cisco.com/v1/tasks/' + taskId + '/record/resume';
+    try {
+      const resumeResponse = await axios.request(url, config);
+      logger.debug("Webex Response to Resume: " + JSON.stringify(resumeResponse.data));
+      logger.info(curModual + "sendPauseResume - Successfully sent pause/resume commands for taskId " + taskId);
+      return true; // Return true on successful completion
+    } catch (error) {
+      logger.debug("Resume returned error: " + error.message);
       return false;
-    });
+    }
+
+  }catch (error){
+    logger.debug("Send pause resume error: " + error.message);
+    return false;
+  }
 }
   
 

@@ -6,11 +6,13 @@ const {
   } = require('toad-scheduler');
 
 const { db } = require('../db/db.js');
-const { getWXRefreshToken, wxDeleteAll } = require('../api/wxccTokenService.js');
-const { getCAAuthToken, caDeleteAll } =  require('../api/caTokenService.js')
-const { findSubscription } = require('../db/subscriptionDb.js')
+const { getWXRefreshToken, wxDeleteAll, getWXToken } = require('../api/wxccTokenService.js');
+const { getCAAuthToken, caDeleteAll, getCAToken  } =  require('../api/caTokenService.js')
+const { findSubscription, updateSubDatabase } = require('../db/subscriptionDb.js')
+const {subscribe} = require('../api/webex.js');
 
 var logger=require('../../../log.js');
+const { get } = require('http');
 
 const INTERVAL = 15;
 
@@ -28,15 +30,43 @@ db.sync({
  */
 const initializeScheduler = async () => {
   
-    // Initialize the Access Tokens upon startup.
-    wxDeleteAll();
-    caDeleteAll();
+  // Initialize the Access Tokens upon startup.
+  // If WXToken is good then dont refresh. if you do this to many times WXCC will kill the integration.
+  try{
+    var retVal = await getWXToken();
+      logger.info('WXCC Access Token upon startup: ' + retVal[0].dataValues.access_token);
+      if (retVal[0].dataValues.access_token != null) {
+        var addDate = new Date(retVal[0].dataValues.createdAt).getTime();
+        var refreshDate = retVal[0].dataValues.refresh_token_expires_in;
+        var dateNow = new Date().getTime();
+        if ((addDate + refreshDate) < dateNow){
+          wxDeleteAll();
+          getWXRefreshToken();
 
-    getWXRefreshToken();
-    getCAAuthToken();
+        }
+
+      }
+    await caDeleteAll();
+    await getCAAuthToken();
+
+    // Check for existing subscription, create one if not found
     subscription_id  =  await findSubscription();
-    
-
+    if (subscription_id.length == 0) {
+      logger.info('No existing Webex CC Subscription found in DB. A new subscription will be created upon server start.');
+      response = await subscribe();
+      if (response != null) {
+        if (response!=false) {
+            await updateSubDatabase(response);
+            res.json({"status": "subscribed", "subscriptionId": subscription_Id});
+            
+        } else {
+            res.json({"status": "unsubscribed", "error": "subscribe failed"});
+        }
+      };
+    };
+  }catch(error){
+    logger.error(`MAJOR ERROR Starting Scheduler: ${error}`);
+  }
     //configure scheduler
     logger.info('Initializing the Scheduler..');
     const scheduler = new ToadScheduler();
