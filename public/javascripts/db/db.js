@@ -1,16 +1,16 @@
 /**
- * This file has the code that enables us to connect to the database.
- * We can externalize the dialect and storage in ENV variables but have hardcoded them here for understanding
+ * DynamoDB database configuration
+ * Replaced Sequelize/SQLite with AWS DynamoDB
  */
-const { Sequelize } = require('sequelize');
-const dotenv = require('dotenv').config();
-var logger = require('../../../log.js');
+const { dynamoDb, TABLES } = require('./dynamodb');
+const logger = require('../../../log.js');
 
-
-// Connect to database
-// This can be changed by initializing a dialect of your choice. MySQL / PostGreSQL / other
-module.exports.db = new Sequelize({
-  logging: msg => logger.debug("lacts.db - " + msg),
-  dialect: 'sqlite',
-  storage: './lacts.db',
+logger.info('DynamoDB client initialized', {
+  region: process.env.AWS_REGION || 'us-east-1',
+  tables: TABLES
 });
+
+// Export for backward compatibility
+module.exports.db = dynamoDb;
+module.exports.dynamoDb = dynamoDb;
+module.exports.TABLES = TABLES;

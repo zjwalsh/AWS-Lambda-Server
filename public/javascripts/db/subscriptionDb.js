@@ -1,64 +1,74 @@
-const { db } = require('./db');
-const { sequelize } = require('sequelize');
-var logger = require('../../../log.js');
-
-
 /**
- * $subscriptions Database object
- *
- * @type {Object.JSON}
+ * DynamoDB operations for Subscriptions table
+ * Replaces Sequelize-based subscriptionDb.js
  */
-const { subscriptions } = require('../../../models/subscriptions.js');
+const { PutCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const { dynamoDb, TABLES } = require('./dynamodb');
+const logger = require('../../../log.js');
 
 /**
  * Query to find if any subscription exists in database
  *
- * @returns {Object.JSON}
+ * @returns {string|null}
  */
 const findSubscription = async () => {
+  try {
+    logger.debug('Find all Subscriptions');
 
-    try{
-        logger.debug("Find all Subscription  " );
-        const subscription = await subscriptions.findAll({limit: 1});
-        return subscription[0].dataValues.id;
-    }catch (error){
-      logger.debug("Error trying to find Subscriptions - " +  error.message);
-      return [];
+    const result = await dynamoDb.send(
+      new ScanCommand({
+        TableName: TABLES.SUBSCRIPTIONS,
+        Limit: 1
+      })
+    );
+
+    if (result.Items && result.Items.length > 0) {
+      return result.Items[0].id;
     }
-
+    return null;
+  } catch (error) {
+    logger.error('Error trying to find Subscriptions', { error: error.message });
+    return null;
+  }
 };
 
- /**
- * Update Database. Check if new user or existing. If new Call getagentInfo to get email and 
- * agent type. If existing just update.
+/**
+ * Update Database with subscription data
  *
  * @async
- * @param {string} payload
+ * @param {Object} payload
  * @returns {boolean}
  */
 const updateSubDatabase = async (payload) => {
+  try {
+    const item = {
+      id: payload.data.data.id,
+      name: payload.data.data.name,
+      description: payload.data.data.description,
+      createdBy: payload.data.data.createdBy,
+      eventTypes: payload.data.data.eventTypes,
+      destinationUrl: payload.data.data.destinationUrl,
+      status: payload.data.data.status,
+      createdTime: payload.data.data.createdTime,
+      updatedAt: new Date().toISOString()
+    };
 
-  try{
-        //Add Record to DB
-        const record = await subscriptions.create(
-          {
-              id: payload.data.data.id,
-              name: payload.data.data.name,
-              description: payload.data.data.description,
-              createdBy: payload.data.data.createdBy,
-              eventTypes: payload.data.data.eventTypes,
-              destinationUrl: payload.data.data.destinationUrl,
-              status: payload.data.data.status,
-              createdTime: payload.data.data.createdTime
-          },
-          { returning: true }
-        );
-        logger.debug('Created new Subscription record: ' + payload.taskId);
+    await dynamoDb.send(
+      new PutCommand({
+        TableName: TABLES.SUBSCRIPTIONS,
+        Item: item
+      })
+    );
 
-    }catch(error){
-        logger.error("Error Updateing subscriptions Database - " + JSON.stringify(error.message));
-        return false
-    }
+    logger.debug(`Created new Subscription record: ${item.id}`);
+    return true;
+  } catch (error) {
+    logger.error('Error updating subscriptions database', { error: error.message });
+    return false;
+  }
 };
 
-module.exports = {updateSubDatabase, findSubscription};
+module.exports = {
+  updateSubDatabase,
+  findSubscription
+};

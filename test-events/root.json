@@ -1,0 +1,19 @@
+{
+    "comment": "Test event for root endpoint",
+    "httpMethod": "GET",
+    "path": "/",
+    "headers": {
+        "Accept": "application/json"
+    },
+    "queryStringParameters": null,
+    "pathParameters": null,
+    "body": null,
+    "isBase64Encoded": false,
+    "requestContext": {
+        "requestId": "test-request-id",
+        "http": {
+            "method": "GET",
+            "path": "/"
+        }
+    }
+}

@@ -23,7 +23,7 @@ global.CACLIENT_ID = process.env["npm_config_calsaws_client_id"] || process.env[
 global.CACLIENT_SECRET = process.env["npm_config_calsaws_client_secret"] || process.env["calsaws_client_secret"] || null;
 global.CACLIENT_SCOPE = process.env["npm_config_calsaws_client_scope"] || process.env["calsaws_client_scope"] || null;
 global.CACASEURL = process.env["npm_config_cacaseurl"] || process.env["cacaseurl"] || null;
-global.CASTOREURL= process.env["npm_config_castoreurl"] || process.env["castoreurl"] || null;
+global.CASTOREURL = process.env["npm_config_castoreurl"] || process.env["castoreurl"] || null;
 global.LOG_LEVEL = process.env["npm_config_log_level"] || process.env["log_level"] || "info";
 global.WEBHOOK_PATH = "/webhook/webhook";
 global.WEBHOOK_URL = process.env["npm_config_webhook_url"] || process.env["webhook_url"] || null;
@@ -31,7 +31,7 @@ global.WXAUTH_URL = process.env["npm_config_wxauth_url"] || process.env["wxauth_
 global.CAAUTH_URL = process.env["npm_config_caauth_url"] || process.env["caauth_url"];
 global.WXCC_WEBHOOK_SECRET = process.env["npm_config_wxcc_webhook_secret"] || process.env["wxcc_webhook_secret"] || null;
 global.WXCC_REFRESH_TOKEN = process.env["npm_config_wxcc_refresh_token"] || process.env["wxcc_refresh_token"] || null;
-global.subscription_Id = null;
+global.SUBSCRIPTION_ID = null;
 global.IDLE_TIMER = process.env["npm_config_idle_timer"] || process.env["idle_timer"] || 0;
 global.LISTEN_PORT = process.env["npm_config_listen_port"] || process.env["listen_port"] || 8443;
 global.CLEAR_DB_ON_START = process.env["npm_config_clear_db_on_start"] || process.env["clear_db_on_start"] || 'false';
@@ -40,7 +40,7 @@ if (WEBHOOK_URL) WEBHOOK_URL = WEBHOOK_URL + WEBHOOK_PATH;
 
 logger.info("Server starting");
 
-process.on('uncaughtException', function(error){
+process.on('uncaughtException', function (error) {
   logger.error(error.stack);
 });
 
@@ -74,7 +74,7 @@ process.on('uncaughtException', function(error){
     logger.error("CACASEURL not defined in npm config or environment.  Cannot run.");
     process.exit(-1);
   }
-    if (CASTOREURL == null) {
+  if (CASTOREURL == null) {
     logger.error("CASTOREURL not defined in npm config or environment.  Cannot run.");
     process.exit(-1);
   }
@@ -82,11 +82,11 @@ process.on('uncaughtException', function(error){
 
   logger.level = LOG_LEVEL;
 
-  logger.info("LOG_LEVEL -" +  LOG_LEVEL);
-  logger.info("WEBHOOK_URL -" +  WEBHOOK_URL);
-  logger.info("WXCLIENT_ID -" +  WXCLIENT_ID);
+  logger.info("LOG_LEVEL -" + LOG_LEVEL);
+  logger.info("WEBHOOK_URL -" + WEBHOOK_URL);
+  logger.info("WXCLIENT_ID -" + WXCLIENT_ID);
   logger.info("WXCLIENT_ORGID -" + WXCLIENT_ORGID);
-  logger.info("WXCLIENT_SECRET -" +  WXCLIENT_SECRET);
+  logger.info("WXCLIENT_SECRET -" + WXCLIENT_SECRET);
 })();
 
 process.on("SIGINT", (code) => {
@@ -171,7 +171,7 @@ try {
   app.use(cors(corsOptions));
   app.options('*', cors(corsOptions));
 
- // Serve static build if present
+  // Serve static build if present
   const publicBuildPath = path.join(__dirname, 'public', 'build');
   const hasBuild = fs.existsSync(publicBuildPath);
   if (hasBuild) {
@@ -255,7 +255,7 @@ try {
   });
 
   // Error handler
-  app.use(function(err, req, res, next) {
+  app.use(function (err, req, res, next) {
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
     res.status(err.status || 500);
@@ -278,8 +278,8 @@ try {
   });
 
 } catch (error) {
-  logger.error("Error opening Server - " +  error);
-  console.log("Error opening Server - " +  error);
+  logger.error("Error opening Server - " + error);
+  console.log("Error opening Server - " + error);
 }
 
 module.exports = { app };

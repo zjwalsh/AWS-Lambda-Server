@@ -1,0 +1,20 @@
+{
+    "comment": "Test event for webhook endpoint",
+    "httpMethod": "POST",
+    "path": "/webhook/webhook",
+    "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    },
+    "queryStringParameters": null,
+    "pathParameters": null,
+    "body": "{\"type\":\"capture:available\",\"source\":\"/api/v1/subscriptions/sub-123\",\"comciscoorgid\":\"org-123\",\"data\":{\"captureId\":\"cap-123\",\"taskId\":\"task-123\"}}",
+    "isBase64Encoded": false,
+    "requestContext": {
+        "requestId": "test-request-id",
+        "http": {
+            "method": "POST",
+            "path": "/webhook/webhook"
+        }
+    }
+}

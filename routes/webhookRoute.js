@@ -3,11 +3,11 @@ var express = require('express');
 var router = express.Router();
 const crypto = require("crypto");
 const bodyParser = require('body-parser');
-var logger=require('../log.js');
+var logger = require('../log.js');
 
 const { subscribe, unsubscribe, getStatus } = require('../public/javascripts/api/webex.js')
-const {findSubscription, updateSubDatabase} = require('../public/javascripts/db/subscriptionDb.js')
-const {proccessRecording} = require('../public/javascripts/api/processRecordings.js')
+const { findSubscription, updateSubDatabase } = require('../public/javascripts/db/subscriptionDb.js')
+const { proccessRecording } = require('../public/javascripts/api/processRecordings.js')
 const jsonParser = bodyParser.json();
 
 //var app = require('../index');
@@ -56,7 +56,7 @@ router.post("/webhook", jsonParser, async (req, res) => {
     //    .createHmac("sha256", secret)
     //    .update(req.rawBody)
     //    .digest("hex");
-      
+
     //const signature = req.headers["x-webexcc-signature"];
 
     //if (signature !== hash) {
@@ -72,10 +72,10 @@ router.post("/webhook", jsonParser, async (req, res) => {
         logger.warn("/webhook - Webhook received with no recording available.  Discarding.");
         res.sendStatus(200);
         return
-    }    
+    }
     retval = await proccessRecording(payload);
     res.sendStatus(200);
-    return;  
+    return;
 });
 
 // Authentication Status Endpoint
@@ -86,7 +86,7 @@ router.post("/webhook", jsonParser, async (req, res) => {
 //});
 
 // Authentication Status Endpoint
-router.get("/status", async(req, res) => {
+router.get("/status", async (req, res) => {
     logger.info("/status - Get Status");
     const response = await getStatus();
     res.json(response);
@@ -94,7 +94,8 @@ router.get("/status", async(req, res) => {
 });
 
 // Server Logoff Endpoint
-router.get("/logoff", (req, res) => {subscription_id
+router.get("/logoff", (req, res) => {
+    SUBSCRIPTION_ID
     logger.info("/logoff - server logoff initiated");
     if (access_token != null) {
         const response = unsubscribe(access_token);
@@ -102,7 +103,8 @@ router.get("/logoff", (req, res) => {subscription_id
             access_token = null;
             code = null;
             refresh_token = null;
-        });          }
+        });
+    }
     res.status(200);
     res.end();
 });
@@ -113,42 +115,42 @@ router.get("/subscribe", async (req, res) => {
     logger.info("/subscribe - Creating Subscription");
     let subscriptions = await findSubscription();
     if (subscriptions.length != 0) {
-        subscription_Id  = subscriptions;
+        SUBSCRIPTION_ID = subscriptions;
     };
-    
-    if (subscription_Id != null) {
+
+    if (SUBSCRIPTION_ID != null) {
         logger.warn("/subscribe - Already subscribed");
         res.status(400);
-        res.send({"error": "subscription already exists"});
+        res.send({ "error": "subscription already exists" });
         return;
     }
     const response = await subscribe();
-    
+
     if (response != null) {
-        if (response!=false) {
+        if (response != false) {
             updateSubDatabase(response);
-            res.json({"status": "subscribed", "subscriptionId": subscription_Id});
-            
+            res.json({ "status": "subscribed", "subscriptionId": SUBSCRIPTION_ID });
+
         } else {
-            res.json({"status": "unsubscribed", "error": "subscribe failed"});
+            res.json({ "status": "unsubscribed", "error": "subscribe failed" });
         }
     };
 });
 /**Unscubscribe Endpoint */
-router.get("/unsubscribe", (req, res) =>{
+router.get("/unsubscribe", (req, res) => {
     logger.info("/unsubscribe - Removing Subscription");
-    if (subscription_Id == null) {
+    if (SUBSCRIPTION_ID == null) {
         logger.warn("/unsubscribe - Already unsubscribed");
         res.status(400);
-        res.send({"error": "no subscription present"});
+        res.send({ "error": "no subscription present" });
         return;
     }
     const response = unsubscribe();
     response.then((response) => {
         if (response) {
-            res.json({"status": "unsubscribed"});
+            res.json({ "status": "unsubscribed" });
         } else {
-            res.json({"status": "subscribed", "error": "unsubscribe failed"});
+            res.json({ "status": "subscribed", "error": "unsubscribe failed" });
         }
     });
 });

@@ -6,14 +6,9 @@
     "auditLog": "logs/.55c8f6d71ce164cd6a7ba3595e4f8d4f31dd5410-audit.json",
     "files": [
         {
-            "date": 1762109260765,
-            "name": "logs/ts-middleware-2025-11-02.log",
-            "hash": "31040f81505183738b9ffa5fd84b4be3910c699af859f008d027fc06ce2b7659"
-        },
-        {
-            "date": 1762185946368,
-            "name": "logs/ts-middleware-2025-11-03.log",
-            "hash": "3df65e7567c27e3e5c3cf3a57530b0203529348c4300c2ea17f36bdf0ca23c17"
+            "date": 1762471731381,
+            "name": "logs/ts-middleware-2025-11-06.log",
+            "hash": "a0f6bf2dcd252c5a92fafc0f28785e46d34d9b2ab43c675c97d35d3855d512e5"
         }
     ],
     "hashType": "sha256"

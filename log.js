@@ -1,25 +1,13 @@
-const { createLogger, format, transports } = require('winston');
-require('winston-daily-rotate-file');
-const { combine, timestamp, printf } = format;
+/**
+ * AWS Lambda Powertools Logger
+ * Replaces Winston logger for Lambda environment
+ */
+const { Logger } = require('@aws-lambda-powertools/logger');
 
-const fileRotateTransport = new transports.DailyRotateFile({
-    filename: 'logs/ts-middleware-%DATE%.log',
-    datePattern: 'YYYY-MM-DD',
-    maxSize: '100m',
-    maxFiles: '3d',
-    zippedArchive: true
-  });
-  
-  const logger = createLogger({
-    level:  process.env["npm_config_log_level"] || process.env["log_level"] || "info",
+// Create logger instance with service name
+const logger = new Logger({
+    serviceName: 'TSMiddleware',
+    logLevel: process.env.LOG_LEVEL || 'INFO'
+});
 
-    format: combine(
-        timestamp({
-          format: "MMM-DD-YYYY HH:mm:ss",
-        }),
-        format.json({ space: 2 })
-        ),
-    transports: [fileRotateTransport],
-  });
-
-module.exports=logger;
+module.exports = logger;

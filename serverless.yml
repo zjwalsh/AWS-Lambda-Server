@@ -1,0 +1,229 @@
+service: tsmiddleware-lambda
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${opt:region, 'us-west-1'}
+  stage: ${opt:stage, 'dev'}
+  memorySize: 512
+  timeout: 30
+  
+  # IAM Role for Lambda
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - !GetAtt AgentsTable.Arn
+            - !GetAtt CapturesTable.Arn
+            - !GetAtt SubscriptionsTable.Arn
+            - !GetAtt WxTokenTable.Arn
+            - !GetAtt CawsTokenTable.Arn
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: '*'
+
+  # Environment variables
+  environment:
+    LOG_LEVEL: ${env:LOG_LEVEL, 'INFO'}
+    AGENTS_TABLE_NAME: !Ref AgentsTable
+    CAPTURES_TABLE_NAME: !Ref CapturesTable
+    SUBSCRIPTIONS_TABLE_NAME: !Ref SubscriptionsTable
+    WX_TOKEN_TABLE_NAME: !Ref WxTokenTable
+    CAWS_TOKEN_TABLE_NAME: !Ref CawsTokenTable
+    AWS_REGION: ${self:provider.region}
+    
+    # Webex Configuration
+    WXCLIENT_ID: ${env:WXCLIENT_ID}
+    WXCLIENT_SECRET: ${env:WXCLIENT_SECRET}
+    WXCLIENT_ORGID: ${env:WXCLIENT_ORGID}
+    WXAUTH_URL: ${env:WXAUTH_URL}
+    WXCC_WEBHOOK_SECRET: ${env:WXCC_WEBHOOK_SECRET}
+    WXCC_REFRESH_TOKEN: ${env:WXCC_REFRESH_TOKEN}
+    
+    # CA Configuration
+    CACLIENT_ID: ${env:CACLIENT_ID}
+    CACLIENT_SECRET: ${env:CACLIENT_SECRET}
+    CACLIENT_SCOPE: ${env:CACLIENT_SCOPE}
+    CACASEURL: ${env:CACASEURL}
+    CASTOREURL: ${env:CASTOREURL}
+    CAAUTH_URL: ${env:CAAUTH_URL}
+    
+    # Other Configuration
+    WEBHOOK_URL: ${env:WEBHOOK_URL}
+    IDLE_TIMER: ${env:IDLE_TIMER, '0'}
+
+functions:
+  api:
+    handler: lambda.handler
+    events:
+      # API Gateway endpoints
+      - httpApi:
+          path: /
+          method: GET
+      
+      # Webhook endpoints
+      - httpApi:
+          path: /webhook/webhook
+          method: POST
+      - httpApi:
+          path: /webhook/status
+          method: GET
+      - httpApi:
+          path: /webhook/subscribe
+          method: GET
+      - httpApi:
+          path: /webhook/unsubscribe
+          method: GET
+      
+      # Token endpoints
+      - httpApi:
+          path: /token/{proxy+}
+          method: ANY
+      
+      # Telephonic Signature endpoints
+      - httpApi:
+          path: /telephonic-signature/pauseResume
+          method: POST
+      - httpApi:
+          path: /telephonic-signature/api/status
+          method: GET
+      - httpApi:
+          path: /telephonic-signature/api/task/{taskId}
+          method: GET
+
+  # Token refresh function - triggered by EventBridge every 15 minutes
+  tokenRefresh:
+    handler: token-refresh.handler
+    description: Refreshes WX and CA tokens periodically
+    memorySize: 256
+    timeout: 60
+    events:
+      - schedule:
+          rate: rate(15 minutes)
+          enabled: true
+          description: 'Refresh WX and CA tokens every 15 minutes'
+
+resources:
+  Resources:
+    # Agents DynamoDB Table
+    AgentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-Agents
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: taskId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: taskId
+            KeyType: HASH
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Service
+            Value: ${self:service}
+
+    # Captures DynamoDB Table
+    CapturesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-Captures
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: taskId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: taskId
+            KeyType: HASH
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Service
+            Value: ${self:service}
+
+    # Subscriptions DynamoDB Table
+    SubscriptionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-Subscriptions
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Service
+            Value: ${self:service}
+
+    # WxToken DynamoDB Table
+    WxTokenTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-WxToken
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Service
+            Value: ${self:service}
+
+    # CawsToken DynamoDB Table
+    CawsTokenTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-CawsToken
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Service
+            Value: ${self:service}
+
+  Outputs:
+    ApiUrl:
+      Description: API Gateway URL
+      Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com
+    
+    AgentsTableName:
+      Description: Agents DynamoDB Table Name
+      Value: !Ref AgentsTable
+    
+    CapturesTableName:
+      Description: Captures DynamoDB Table Name
+      Value: !Ref CapturesTable
+    
+    SubscriptionsTableName:
+      Description: Subscriptions DynamoDB Table Name
+      Value: !Ref SubscriptionsTable
+
+plugins:
+  - serverless-offline
