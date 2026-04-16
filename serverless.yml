@@ -36,13 +36,7 @@ provider:
   httpApi:
     cors:
       allowedOrigins:
-        - https://desktop.wxcc-us1.cisco.com
-        - https://desktop.wxcc-eu1.cisco.com
-        - https://desktop.wxcc-eu2.cisco.com
-        - https://desktop.wxcc-anz1.cisco.com
-        - https://desktop.wxcc-ca1.cisco.com
-        - http://localhost:3000
-        - http://localhost:8080
+        - '*'
       allowedHeaders:
         - Content-Type
         - Authorization
