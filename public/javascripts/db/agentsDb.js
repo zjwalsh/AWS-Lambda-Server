@@ -5,7 +5,7 @@
  *   taskId  (partition key) - Webex call identifier, groups all pairs for a call
  *   recordId (sort key, UUID) - uniquely identifies each pause/resume pair
  */
-const { PutCommand, UpdateCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
+const { PutCommand, UpdateCommand, QueryCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
 const { dynamoDb, TABLES } = require('./dynamodb');
 const logger = require('../../../log.js');
 const { randomUUID } = require('crypto');
@@ -276,6 +276,45 @@ const updateAgentFields = async (taskId, fields) => {
   }
 };
 
+/**
+ * Scan all records where createdAt falls within the given date range.
+ * startDate and endDate are YYYY-MM-DD strings (endDate is inclusive).
+ *
+ * @param {string} startDate - e.g. "2026-04-09"
+ * @param {string} endDate   - e.g. "2026-04-16"
+ * @returns {Array}
+ */
+const getRecordsByDateRange = async (startDate, endDate) => {
+  try {
+    const start = `${startDate}T00:00:00.000Z`;
+    const end   = `${endDate}T23:59:59.999Z`;
+
+    let allItems = [];
+    let lastEvaluatedKey = undefined;
+
+    do {
+      const params = {
+        TableName: TABLES.AGENTS,
+        FilterExpression: 'createdAt BETWEEN :start AND :end',
+        ExpressionAttributeValues: { ':start': start, ':end': end },
+        ...(lastEvaluatedKey && { ExclusiveStartKey: lastEvaluatedKey })
+      };
+
+      const result = await dynamoDb.send(new ScanCommand(params));
+      allItems = allItems.concat(result.Items || []);
+      lastEvaluatedKey = result.LastEvaluatedKey;
+    } while (lastEvaluatedKey);
+
+    allItems.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+    logger.debug(`getRecordsByDateRange found ${allItems.length} records between ${startDate} and ${endDate}`);
+    return allItems;
+
+  } catch (error) {
+    logger.error(`Failed to scan records by date range`, { error: error.message, startDate, endDate });
+    return [];
+  }
+};
+
 module.exports = {
   createAgentRecord,
   countRecordsByTaskId,
@@ -284,5 +323,6 @@ module.exports = {
   updateRecordTimestamp,
   updateAgentWithCaseUUID,
   updateAgentFields,
+  getRecordsByDateRange,
   getDbMetadata
 };

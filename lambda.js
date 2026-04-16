@@ -193,6 +193,8 @@ exports.handler = async (event, context) => {
             await routeToken(req, res, path, method);
         } else if (path.startsWith('/telephonic-signature')) {
             await routeTelephonicSignature(req, res, path, method);
+        } else if (path === '/recording-log' && method === 'GET') {
+            await routeRecordingLog(req, res);
         } else {
             response.statusCode = 404;
             response.body = JSON.stringify({ error: 'Not Found' });
@@ -404,4 +406,27 @@ async function routeTelephonicSignature(req, res, path, method) {
     } else {
         res.status(404).json({ error: 'Not Found' });
     }
+}
+
+/**
+ * GET /recording-log?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
+ */
+async function routeRecordingLog(req, res) {
+    const { getRecordsByDateRange } = require('./public/javascripts/db/agentsDb');
+
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+        res.status(400).json({ error: 'startDate and endDate query parameters are required' });
+        return;
+    }
+
+    const records = await getRecordsByDateRange(startDate, endDate);
+    res.status(200).json({
+        success: true,
+        startDate,
+        endDate,
+        recordCount: records.length,
+        data: records
+    });
 }
