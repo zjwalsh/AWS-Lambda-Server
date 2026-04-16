@@ -4,14 +4,14 @@
 
 ### 1. Prerequisites Check
 ```bash
-# Check Node.js version (should be 18.x or later)
+# Check Node.js version (v4 supports Node 22.x)
 node --version
 
-# Check AWS CLI is configured
-aws sts get-caller-identity
+# Authenticate with AWS SSO
+aws sso login --profile lac-customer
 
-# Install Serverless Framework globally
-npm install -g serverless
+# Install Serverless Framework v4 globally
+npm install -g serverless@latest
 ```
 
 ### 2. Install Dependencies
@@ -76,7 +76,7 @@ curl https://xxxxxxxxxx.execute-api.us-west-1.amazonaws.com/telephonic-signature
 ## Deployment Checklist
 
 - [ ] AWS CLI configured with proper credentials
-- [ ] Node.js 18.x installed
+- [ ] Node.js 22.x installed
 - [ ] All environment variables set in `.env`
 - [ ] Dependencies installed (`npm install`)
 - [ ] Serverless Framework installed globally
@@ -184,6 +184,11 @@ Typical monthly costs for moderate usage:
 
 ### Deployment Fails
 ```bash
+# Check for SAM Conflicts
+# Serverless v4 may crash if template.yaml or samconfig.toml exist.
+# Delete or rename these files if you encounter "Received null" path errors.
+rm template.yaml, samconfig.toml
+
 # Check CloudFormation stack events
 aws cloudformation describe-stack-events --stack-name tsmiddleware-lambda-dev
 

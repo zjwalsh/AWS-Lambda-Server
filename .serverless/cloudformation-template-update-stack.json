@@ -1,0 +1,905 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ApiLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/dpss-ts-dev-middleware-dev-api"
+      }
+    },
+    "TokenRefreshLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/dpss-ts-dev-middleware-dev-tokenRefresh"
+      }
+    },
+    "IamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "dpss-ts-dev-middleware",
+                  "dev",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup",
+                    "logs:TagResource"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/dpss-ts-dev-middleware-dev*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/dpss-ts-dev-middleware-dev*:*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:Query",
+                    "dynamodb:Scan",
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem"
+                  ],
+                  "Resource": "arn:aws:dynamodb:us-west-2:*:table/dpss-ts-dev-middleware-dev-*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "dpss-ts-dev-middleware",
+              "dev",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        }
+      }
+    },
+    "ApiLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
+          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776207365759-2026-04-14T22:56:05.759Z/dpss-ts-dev-middleware.zip"
+        },
+        "Handler": "lambda.handler",
+        "Runtime": "nodejs22.x",
+        "FunctionName": "dpss-ts-dev-middleware-dev-api",
+        "MemorySize": 1024,
+        "Timeout": 29,
+        "Environment": {
+          "Variables": {
+            "LOG_LEVEL": "DEBUG",
+            "AGENTS_TABLE_NAME": {
+              "Ref": "AgentsTable"
+            },
+            "CAPTURES_TABLE_NAME": {
+              "Ref": "CapturesTable"
+            },
+            "SUBSCRIPTIONS_TABLE_NAME": {
+              "Ref": "SubscriptionsTable"
+            },
+            "WX_TOKEN_TABLE_NAME": {
+              "Ref": "WxTokenTable"
+            },
+            "CAWS_TOKEN_TABLE_NAME": {
+              "Ref": "CawsTokenTable"
+            },
+            "WXCLIENT_ID": "C5340e35bec7190747267d0065ff3d61a7304d828adc8205874d95875c9d038fa",
+            "WXCLIENT_SECRET": "bf07aa5817cabe062e3a357efacc4890c5ed40667547bb0b6c6584b3ff86febd",
+            "WXCLIENT_ORGID": "4f25a9a0-32e6-445f-b347-d920b9b857be",
+            "WXAUTH_URL": "https://webexapis.com/v1/access_token",
+            "WXCC_WEBHOOK_SECRET": "1ee1a4fd-145f-4e7e-a7fe-7f1a0dddf444",
+            "WXCC_REFRESH_TOKEN": "RzQwMzExNzMtMzhlYi00ZjljLTk4MzItZjkxNDAxZDUxZTcxZjQzNDJlNGItN2Rm_PF84_4f25a9a0-32e6-445f-b347-d920b9b857be",
+            "CACLIENT_ID": "5KLMJtqxDnthworg",
+            "CACLIENT_SECRET": ";L/89v(NA*uUS?Mq/>f",
+            "CACLIENT_SCOPE": "TeleSig_19",
+            "CACASEURL": "https://capi.calsaws.net/imaging-service/inbound/case",
+            "CASTOREURL": "https://capi.calsaws.net/imaging-service/outbound/image/store",
+            "CAAUTH_URL": "https://id.calsaws.net:443/auth/oauth2/realms/root/realms/calsaws/access_token?grant_type=client_credentials&token_endpoint_auth_method=client_secret_post",
+            "WEBHOOK_URL": "https://gx61czlm4k.execute-api.us-west-2.amazonaws.com",
+            "IDLE_TIMER": "0",
+            "FFMPEG_PATH": "/opt/bin/ffmpeg",
+            "FFPROBE_PATH": "/opt/bin/ffprobe"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "ApiLogGroup"
+      ]
+    },
+    "TokenRefreshLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
+          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776207365759-2026-04-14T22:56:05.759Z/dpss-ts-dev-middleware.zip"
+        },
+        "Handler": "token-refresh.handler",
+        "Runtime": "nodejs22.x",
+        "FunctionName": "dpss-ts-dev-middleware-dev-tokenRefresh",
+        "MemorySize": 256,
+        "Timeout": 60,
+        "Description": "Refreshes WX and CA tokens periodically",
+        "Environment": {
+          "Variables": {
+            "LOG_LEVEL": "DEBUG",
+            "AGENTS_TABLE_NAME": {
+              "Ref": "AgentsTable"
+            },
+            "CAPTURES_TABLE_NAME": {
+              "Ref": "CapturesTable"
+            },
+            "SUBSCRIPTIONS_TABLE_NAME": {
+              "Ref": "SubscriptionsTable"
+            },
+            "WX_TOKEN_TABLE_NAME": {
+              "Ref": "WxTokenTable"
+            },
+            "CAWS_TOKEN_TABLE_NAME": {
+              "Ref": "CawsTokenTable"
+            },
+            "WXCLIENT_ID": "C5340e35bec7190747267d0065ff3d61a7304d828adc8205874d95875c9d038fa",
+            "WXCLIENT_SECRET": "bf07aa5817cabe062e3a357efacc4890c5ed40667547bb0b6c6584b3ff86febd",
+            "WXCLIENT_ORGID": "4f25a9a0-32e6-445f-b347-d920b9b857be",
+            "WXAUTH_URL": "https://webexapis.com/v1/access_token",
+            "WXCC_WEBHOOK_SECRET": "1ee1a4fd-145f-4e7e-a7fe-7f1a0dddf444",
+            "WXCC_REFRESH_TOKEN": "RzQwMzExNzMtMzhlYi00ZjljLTk4MzItZjkxNDAxZDUxZTcxZjQzNDJlNGItN2Rm_PF84_4f25a9a0-32e6-445f-b347-d920b9b857be",
+            "CACLIENT_ID": "5KLMJtqxDnthworg",
+            "CACLIENT_SECRET": ";L/89v(NA*uUS?Mq/>f",
+            "CACLIENT_SCOPE": "TeleSig_19",
+            "CACASEURL": "https://capi.calsaws.net/imaging-service/inbound/case",
+            "CASTOREURL": "https://capi.calsaws.net/imaging-service/outbound/image/store",
+            "CAAUTH_URL": "https://id.calsaws.net:443/auth/oauth2/realms/root/realms/calsaws/access_token?grant_type=client_credentials&token_endpoint_auth_method=client_secret_post",
+            "WEBHOOK_URL": "https://gx61czlm4k.execute-api.us-west-2.amazonaws.com",
+            "IDLE_TIMER": "0",
+            "FFMPEG_PATH": "/opt/bin/ffmpeg",
+            "FFPROBE_PATH": "/opt/bin/ffprobe"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "TokenRefreshLogGroup"
+      ]
+    },
+    "ApiLambdaVersionInlqlktr7OiPSNbcwqbE8K7MW4jk006ipN4oGVBTU": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "ApiLambdaFunction"
+        },
+        "CodeSha256": "P0PG+wK8DDyLD4QCiKsBv4LvweTrqvDEnFgrL6ZMOtA="
+      }
+    },
+    "TokenRefreshLambdaVersionlIcmDTkuTaMAbB30ky3zOSqQsk5AU3pMRM67lqj3A": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "TokenRefreshLambdaFunction"
+        },
+        "CodeSha256": "P0PG+wK8DDyLD4QCiKsBv4LvweTrqvDEnFgrL6ZMOtA=",
+        "Description": "Refreshes WX and CA tokens periodically"
+      }
+    },
+    "TokenRefreshEventsRuleSchedule1": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "rate(15 minutes)",
+        "State": "ENABLED",
+        "Description": "Refresh WX and CA tokens every 15 minutes",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "TokenRefreshLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": "tokenRefreshSchedule"
+          }
+        ]
+      }
+    },
+    "TokenRefreshLambdaPermissionEventsRuleSchedule1": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "TokenRefreshLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "TokenRefreshEventsRuleSchedule1",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "HttpApi": {
+      "Type": "AWS::ApiGatewayV2::Api",
+      "Properties": {
+        "Name": "dev-dpss-ts-dev-middleware",
+        "ProtocolType": "HTTP",
+        "CorsConfiguration": {
+          "AllowHeaders": [
+            "Content-Type",
+            "Authorization",
+            "X-Amz-Date",
+            "X-Api-Key",
+            "X-Amz-Security-Token"
+          ],
+          "AllowMethods": [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "OPTIONS"
+          ],
+          "AllowOrigins": [
+            "https://desktop.wxcc-us1.cisco.com",
+            "https://desktop.wxcc-eu1.cisco.com",
+            "https://desktop.wxcc-eu2.cisco.com",
+            "https://desktop.wxcc-anz1.cisco.com",
+            "https://desktop.wxcc-ca1.cisco.com",
+            "http://localhost:3000",
+            "http://localhost:8080"
+          ],
+          "MaxAge": 3600
+        }
+      }
+    },
+    "HttpApiStage": {
+      "Type": "AWS::ApiGatewayV2::Stage",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "StageName": "$default",
+        "AutoDeploy": true,
+        "DefaultRouteSettings": {
+          "DetailedMetricsEnabled": false
+        }
+      }
+    },
+    "ApiLambdaPermissionHttpApi": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "ApiLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "HttpApi"
+              },
+              "/*"
+            ]
+          ]
+        }
+      }
+    },
+    "HttpApiIntegrationApi": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::GetAtt": [
+            "ApiLambdaFunction",
+            "Arn"
+          ]
+        },
+        "PayloadFormatVersion": "2.0",
+        "TimeoutInMillis": 30000
+      }
+    },
+    "HttpApiRouteGet": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "HttpApiRoutePostWebhookWebhook": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "POST /webhook/webhook",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "HttpApiRouteGetWebhookStatus": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /webhook/status",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "HttpApiRouteGetWebhookSubscribe": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /webhook/subscribe",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "HttpApiRouteGetWebhookUnsubscribe": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /webhook/unsubscribe",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "HttpApiRouteAnyTokenProxyVar": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "ANY /token/{proxy+}",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "HttpApiRoutePostTelephonicDashsignaturePauseresume": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "POST /telephonic-signature/pauseResume",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "HttpApiRouteGetTelephonicDashsignatureApiStatus": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /telephonic-signature/api/status",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "HttpApiRouteGetTelephonicDashsignatureApiTaskTaskidVar": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /telephonic-signature/api/task/{taskId}",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "HttpApiRouteGetTestDatabase": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /test/database",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "HttpApiRouteGetTestTables": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /test/tables",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "HttpApiRouteGetTestAudioDashcheck": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /test/audio-check",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "HttpApiRouteGetRecordingDashlog": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /recording-log",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationApi"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationApi"
+    },
+    "AgentsTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "dpss-ts-dev-middleware-dev-Agents",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "taskId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "recordId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "taskId",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "recordId",
+            "KeyType": "RANGE"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": "dev"
+          },
+          {
+            "Key": "Service",
+            "Value": "dpss-ts-dev-middleware"
+          }
+        ]
+      }
+    },
+    "CapturesTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "dpss-ts-dev-middleware-dev-Captures",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "taskId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "taskId",
+            "KeyType": "HASH"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": "dev"
+          },
+          {
+            "Key": "Service",
+            "Value": "dpss-ts-dev-middleware"
+          }
+        ]
+      }
+    },
+    "SubscriptionsTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "dpss-ts-dev-middleware-dev-Subscriptions",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": "dev"
+          },
+          {
+            "Key": "Service",
+            "Value": "dpss-ts-dev-middleware"
+          }
+        ]
+      }
+    },
+    "WxTokenTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "dpss-ts-dev-middleware-dev-WxToken",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": "dev"
+          },
+          {
+            "Key": "Service",
+            "Value": "dpss-ts-dev-middleware"
+          }
+        ]
+      }
+    },
+    "CawsTokenTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "dpss-ts-dev-middleware-dev-CawsToken",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": "dev"
+          },
+          {
+            "Key": "Service",
+            "Value": "dpss-ts-dev-middleware"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
+      "Export": {
+        "Name": "sls-dpss-ts-dev-middleware-dev-ServerlessDeploymentBucketName"
+      }
+    },
+    "ApiLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "ApiLambdaVersionInlqlktr7OiPSNbcwqbE8K7MW4jk006ipN4oGVBTU"
+      },
+      "Export": {
+        "Name": "sls-dpss-ts-dev-middleware-dev-ApiLambdaFunctionQualifiedArn"
+      }
+    },
+    "TokenRefreshLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "TokenRefreshLambdaVersionlIcmDTkuTaMAbB30ky3zOSqQsk5AU3pMRM67lqj3A"
+      },
+      "Export": {
+        "Name": "sls-dpss-ts-dev-middleware-dev-TokenRefreshLambdaFunctionQualifiedArn"
+      }
+    },
+    "HttpApiId": {
+      "Description": "Id of the HTTP API",
+      "Value": {
+        "Ref": "HttpApi"
+      },
+      "Export": {
+        "Name": "sls-dpss-ts-dev-middleware-dev-HttpApiId"
+      }
+    },
+    "HttpApiUrl": {
+      "Description": "URL of the HTTP API",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "HttpApi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix"
+            }
+          ]
+        ]
+      },
+      "Export": {
+        "Name": "sls-dpss-ts-dev-middleware-dev-HttpApiUrl"
+      }
+    },
+    "ApiUrl": {
+      "Description": "API Gateway URL",
+      "Value": {
+        "Fn::Sub": "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+      }
+    },
+    "AgentsTableName": {
+      "Description": "Agents DynamoDB Table Name",
+      "Value": {
+        "Ref": "AgentsTable"
+      }
+    },
+    "CapturesTableName": {
+      "Description": "Captures DynamoDB Table Name",
+      "Value": {
+        "Ref": "CapturesTable"
+      }
+    },
+    "SubscriptionsTableName": {
+      "Description": "Subscriptions DynamoDB Table Name",
+      "Value": {
+        "Ref": "SubscriptionsTable"
+      }
+    }
+  }
+}

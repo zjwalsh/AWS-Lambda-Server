@@ -4,6 +4,7 @@
 
 const axios = require("axios");
 const { getWXAccessToken } = require('../api/wxccTokenService.js')
+const { findSubscription, deleteSubscription } = require('../db/subscriptionDb.js');
 var logger = require('../../../log.js');
 var curModual = " - api.js - "
 
@@ -19,7 +20,7 @@ const sendPauseResume = async (taskId) => {
     const accessToken = await getWXAccessToken();
     if (accessToken == null) {
       logger.warn(curModual + "sendPauseResume - No Access Token");
-      return false;
+      return null;
     }
 
     // Send the Pause Resume commands to Webexcc
@@ -39,8 +40,8 @@ const sendPauseResume = async (taskId) => {
       const pauseResponse = await axios.request(url, config);
       logger.debug("Webex Response to Pause: " + JSON.stringify(pauseResponse.data));
     } catch (error) {
-      logger.debug("Pause returned error: " + error.message);
-      return false;
+      logger.error("Pause returned error: " + error.message);
+      return null;
     }
 
     //Send the Resume command
@@ -48,16 +49,22 @@ const sendPauseResume = async (taskId) => {
     try {
       const resumeResponse = await axios.request(url, config);
       logger.debug("Webex Response to Resume: " + JSON.stringify(resumeResponse.data));
-      logger.info(curModual + "sendPauseResume - Successfully sent pause/resume commands for taskId " + taskId);
-      return true; // Return true on successful completion
+      
+      // Capture Cisco's server time from the response headers to align with segment timestamps
+      const ciscoDate = resumeResponse.headers.date;
+      const ciscoTimestamp = ciscoDate ? new Date(ciscoDate).getTime() : Date.now();
+      
+      logger.info(curModual + `sendPauseResume - Success for taskId ${taskId}. Cisco Time: ${ciscoTimestamp}`);
+      
+      return { success: true, timestamp: ciscoTimestamp };
     } catch (error) {
-      logger.debug("Resume returned error: " + error.message);
-      return false;
+      logger.error("Resume returned error: " + error.message);
+      return null;
     }
 
   } catch (error) {
-    logger.debug("Send pause resume error: " + error.message);
-    return false;
+    logger.error("Send pause resume error: " + error.message);
+    return null;
   }
 }
 
@@ -72,6 +79,13 @@ const subscribe = async () => {
 
   logger.info(curModual + "subscribe - Subscribing to WebEx WebHooks");
 
+  // Check for an existing subscription record in the database to prevent duplicate entries
+  const existingId = await findSubscription();
+  if (existingId) {
+    logger.warn(curModual + "subscribe - Subscription already exists in database: " + existingId);
+    return { data: { data: { id: existingId, status: "active" } }, alreadyExists: true };
+  }
+
   const accessToken = await getWXAccessToken();
 
   let payload = {
@@ -81,7 +95,6 @@ const subscribe = async () => {
       "capture:available",
     ],
     destinationUrl: WEBHOOK_URL,
-    secret: WXCLIENT_SECRET,
     orgId: WXCLIENT_ORGID,
     secret: WXCC_WEBHOOK_SECRET,
     resourceVersion: "capture:1.0.0"
@@ -138,6 +151,7 @@ const unsubscribe = async () => {
     )
     logger.debug(curModual + "unsubscribe - unsubscription sent");
     logger.debug(curModual + "unsubscribe - HTTP Response code " + response.status + " - TrackingId - " + response.headers.trackingid);
+    await deleteSubscription(SUBSCRIPTION_ID);
     SUBSCRIPTION_ID = null;
     return true;
   } catch (error) {

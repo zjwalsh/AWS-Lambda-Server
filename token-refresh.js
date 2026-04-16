@@ -6,6 +6,16 @@
 const { Logger } = require('@aws-lambda-powertools/logger');
 const logger = new Logger({ serviceName: 'TSMiddleware-TokenRefresh' });
 
+// Set up globals required by token service modules (same as lambda.js)
+global.WXAUTH_URL = process.env.WXAUTH_URL || null;
+global.WXCLIENT_ID = process.env.WXCLIENT_ID || null;
+global.WXCLIENT_SECRET = process.env.WXCLIENT_SECRET || null;
+global.WXCC_REFRESH_TOKEN = process.env.WXCC_REFRESH_TOKEN || null;
+global.CAAUTH_URL = process.env.CAAUTH_URL || null;
+global.CACLIENT_ID = process.env.CACLIENT_ID || null;
+global.CACLIENT_SECRET = process.env.CACLIENT_SECRET || null;
+global.CACLIENT_SCOPE = process.env.CACLIENT_SCOPE || null;
+
 const { getWXRefreshToken, wxDeleteAll, getWXToken } = require('./public/javascripts/api/wxccTokenService.js');
 const { getCAAuthToken, caDeleteAll } = require('./public/javascripts/api/caTokenService.js');
 
@@ -26,12 +36,12 @@ exports.handler = async (event, context) => {
         const wxToken = await getWXToken();
 
         if (wxToken && wxToken.length > 0) {
-            const tokenData = wxToken[0].dataValues || wxToken[0];
+            const tokenData = wxToken[0] || wxToken[0];
             logger.info('WX Access Token exists', { tokenExists: !!tokenData.access_token });
 
             if (tokenData.access_token != null) {
-                const addDate = new Date(tokenData.createdAt).getTime();
-                const refreshDate = tokenData.refresh_token_expires_in;
+                const addDate = new Date(tokenData.updatedAt).getTime();
+                const refreshDate = tokenData.refresh_token_expires_in * 1000; // API returns seconds, convert to ms
                 const dateNow = new Date().getTime();
 
                 // Check if token needs refresh

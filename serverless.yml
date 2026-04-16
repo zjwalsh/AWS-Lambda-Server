@@ -1,16 +1,70 @@
-service: tsmiddleware-lambda
+service: dpss-ts-dev-middleware
 
-frameworkVersion: '3'
+useDotenv: true
+
+custom:
+  # FFmpeg layer ARNs - Using community-maintained layers
+  ffmpegLayer:
+    us-east-1: arn:aws:lambda:us-east-1:145266761615:layer:ffmpeg:4
+    us-west-1: arn:aws:lambda:us-west-1:145266761615:layer:ffmpeg:4
+    us-west-2: arn:aws:lambda:us-west-2:145266761615:layer:ffmpeg:4
+    eu-west-1: arn:aws:lambda:eu-west-1:145266761615:layer:ffmpeg:4
+    eu-central-1: arn:aws:lambda:eu-central-1:145266761615:layer:ffmpeg:4
+    ap-southeast-1: arn:aws:lambda:ap-southeast-1:145266761615:layer:ffmpeg:4
+    ap-northeast-1: arn:aws:lambda:ap-northeast-1:145266761615:layer:ffmpeg:4
+    default: arn:aws:lambda:us-east-1:145266761615:layer:ffmpeg:4
+
+package:
+  patterns:
+    - '!template.yaml'
+    - '!samconfig.toml'
+    - '!.aws-sam/**'
+    - '!.serverless/**'
 
 provider:
   name: aws
-  runtime: nodejs18.x
-  region: ${opt:region, 'us-west-1'}
+  runtime: nodejs22.x
+  region: us-west-2
   stage: ${opt:stage, 'dev'}
-  memorySize: 512
+  profile: lac-customer
+  memorySize: 1024
   timeout: 30
+  versionFunctions: true
+
+
+  # HTTP API CORS Configuration
+  httpApi:
+    cors:
+      allowedOrigins:
+        - https://desktop.wxcc-us1.cisco.com
+        - https://desktop.wxcc-eu1.cisco.com
+        - https://desktop.wxcc-eu2.cisco.com
+        - https://desktop.wxcc-anz1.cisco.com
+        - https://desktop.wxcc-ca1.cisco.com
+        - http://localhost:3000
+        - http://localhost:8080
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+        - X-Amz-Date
+        - X-Api-Key
+        - X-Amz-Security-Token
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+      allowCredentials: false
+      maxAge: 3600
   
-  # IAM Role for Lambda
+  # Lambda layers for FFmpeg binary
+  # Note: FFmpeg layer temporarily disabled - application works without it
+  # Will add custom layer later: 
+  # layers:
+  #   - arn:aws:lambda:us-west-1:YOUR_ACCOUNT:layer:tsmiddleware-ffmpeg:1
+  
+  # IAM Role for Lambda - Version 4 Syntax
   iam:
     role:
       statements:
@@ -22,18 +76,14 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
-          Resource:
-            - !GetAtt AgentsTable.Arn
-            - !GetAtt CapturesTable.Arn
-            - !GetAtt SubscriptionsTable.Arn
-            - !GetAtt WxTokenTable.Arn
-            - !GetAtt CawsTokenTable.Arn
+          Resource: 
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-${self:provider.stage}-*"
         - Effect: Allow
           Action:
             - logs:CreateLogGroup
             - logs:CreateLogStream
             - logs:PutLogEvents
-          Resource: '*'
+          Resource: "*"
 
   # Environment variables
   environment:
@@ -43,31 +93,37 @@ provider:
     SUBSCRIPTIONS_TABLE_NAME: !Ref SubscriptionsTable
     WX_TOKEN_TABLE_NAME: !Ref WxTokenTable
     CAWS_TOKEN_TABLE_NAME: !Ref CawsTokenTable
-    AWS_REGION: ${self:provider.region}
+    # AWS_REGION is automatically available in Lambda environment
     
     # Webex Configuration
-    WXCLIENT_ID: ${env:WXCLIENT_ID}
-    WXCLIENT_SECRET: ${env:WXCLIENT_SECRET}
-    WXCLIENT_ORGID: ${env:WXCLIENT_ORGID}
-    WXAUTH_URL: ${env:WXAUTH_URL}
-    WXCC_WEBHOOK_SECRET: ${env:WXCC_WEBHOOK_SECRET}
-    WXCC_REFRESH_TOKEN: ${env:WXCC_REFRESH_TOKEN}
+    WXCLIENT_ID: ${env:WXCLIENT_ID, ''}
+    WXCLIENT_SECRET: ${env:WXCLIENT_SECRET, ''}
+    WXCLIENT_ORGID: ${env:WXCLIENT_ORGID, ''}
+    WXAUTH_URL: ${env:WXAUTH_URL, ''}
+    WXCC_WEBHOOK_SECRET: ${env:WXCC_WEBHOOK_SECRET, ''}
+    WXCC_REFRESH_TOKEN: ${env:WXCC_REFRESH_TOKEN, ''}
     
     # CA Configuration
-    CACLIENT_ID: ${env:CACLIENT_ID}
-    CACLIENT_SECRET: ${env:CACLIENT_SECRET}
-    CACLIENT_SCOPE: ${env:CACLIENT_SCOPE}
-    CACASEURL: ${env:CACASEURL}
-    CASTOREURL: ${env:CASTOREURL}
-    CAAUTH_URL: ${env:CAAUTH_URL}
+    CACLIENT_ID: ${env:CACLIENT_ID, ''}
+    CACLIENT_SECRET: ${env:CACLIENT_SECRET, ''}
+    CACLIENT_SCOPE: ${env:CACLIENT_SCOPE, ''}
+    CACASEURL: ${env:CACASEURL, ''}
+    CASTOREURL: ${env:CASTOREURL, ''}
+    CAAUTH_URL: ${env:CAAUTH_URL, ''}
     
     # Other Configuration
-    WEBHOOK_URL: ${env:WEBHOOK_URL}
+    WEBHOOK_URL: ${env:WEBHOOK_URL, ''}
     IDLE_TIMER: ${env:IDLE_TIMER, '0'}
+    
+    # FFmpeg Configuration for Lambda Layer
+    FFMPEG_PATH: /opt/bin/ffmpeg
+    FFPROBE_PATH: /opt/bin/ffprobe
 
 functions:
   api:
     handler: lambda.handler
+    memorySize: 1024 # Increased memory for FFmpeg processing
+    timeout: 29      # Adjusted to match HTTP API maximum 29s timeout
     events:
       # API Gateway endpoints
       - httpApi:
@@ -103,6 +159,23 @@ functions:
       - httpApi:
           path: /telephonic-signature/api/task/{taskId}
           method: GET
+      
+      # Database test endpoints
+      - httpApi:
+          path: /test/database
+          method: GET
+      - httpApi:
+          path: /test/tables
+          method: GET
+      # Audio conversion test endpoint
+      - httpApi:
+          path: /test/audio-check
+          method: GET
+      
+      # Recording log endpoint - query agent calls by date range
+      - httpApi:
+          path: /recording-log
+          method: GET
 
   # Token refresh function - triggered by EventBridge every 15 minutes
   tokenRefresh:
@@ -119,6 +192,8 @@ functions:
 resources:
   Resources:
     # Agents DynamoDB Table
+    # Composite key: taskId (partition) + recordId (sort)
+    # Each pause/resume pair is a separate item; all pairs for a call share the same taskId.
     AgentsTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -127,9 +202,13 @@ resources:
         AttributeDefinitions:
           - AttributeName: taskId
             AttributeType: S
+          - AttributeName: recordId
+            AttributeType: S
         KeySchema:
           - AttributeName: taskId
             KeyType: HASH
+          - AttributeName: recordId
+            KeyType: RANGE
         Tags:
           - Key: Environment
             Value: ${self:provider.stage}

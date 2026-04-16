@@ -7,11 +7,6 @@ const { injectLambdaContext } = require('@aws-lambda-powertools/logger');
 
 const logger = new Logger({ serviceName: 'TSMiddleware' });
 
-// Import route handlers
-const webhookRouter = require('./routes/webhookRoute.js');
-const tokenRouter = require('./routes/tokenRoute.js');
-const tsRouter = require('./routes/telephonic-signature.js');
-
 // Environment variables (same as before)
 global.WXCLIENT_ID = process.env.WXCLIENT_ID || process.env.wxcc_wxclient_id || null;
 global.WXCLIENT_SECRET = process.env.WXCLIENT_SECRET || process.env.xcc_wxclient_secret || null;
@@ -31,7 +26,7 @@ global.WXCC_REFRESH_TOKEN = process.env.WXCC_REFRESH_TOKEN || process.env.wxcc_r
 global.SUBSCRIPTION_ID = null;
 global.IDLE_TIMER = process.env.IDLE_TIMER || process.env.idle_timer || 0;
 
-if (WEBHOOK_URL) WEBHOOK_URL = WEBHOOK_URL + WEBHOOK_PATH;
+if (WEBHOOK_URL) WEBHOOK_URL = WEBHOOK_URL.replace(/\/$/, '') + WEBHOOK_PATH;
 
 // Initialize startup tasks once on cold start (tokens & subscription)
 const { initializeOnStartup } = require('./public/javascripts/scheduler/startup.js');
@@ -86,19 +81,30 @@ exports.handler = async (event, context) => {
         // Validate configuration on first invocation
         validateConfig();
 
-        // Initialize startup tasks on cold start (tokens & subscription)
-        await initStartup();        // Parse path and method
+        // Initialize startup tasks (Tokens/Sub)
+        await initStartup();
+
+        // Parse path and method
         const path = event.path || event.rawPath || '/';
         const method = event.httpMethod || event.requestContext?.http?.method || 'GET';
-        const body = event.body ? (event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString('utf-8') : event.body) : null;
-        const parsedBody = body ? JSON.parse(body) : {};
+
+        // Safely parse body (handle cases where body might already be an object or invalid JSON)
+        let parsedBody = {};
+        if (event.body) {
+            try {
+                const bodyStr = event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString('utf-8') : event.body;
+                parsedBody = typeof bodyStr === 'string' ? JSON.parse(bodyStr) : bodyStr;
+            } catch (e) {
+                logger.warn('Failed to parse request body', { error: e.message });
+            }
+        }
 
         // Create Express-like request object for compatibility
         const req = {
             path,
             method,
             body: parsedBody,
-            rawBody: body,
+            rawBody: event.body,
             headers: event.headers || {},
             query: event.queryStringParameters || {},
             params: event.pathParameters || {},
@@ -160,6 +166,16 @@ exports.handler = async (event, context) => {
                 body: JSON.stringify({
                     name: 'TSForms Lambda API',
                     status: 'running',
+                    // UPDATED TIMESTAMP: Change this to the current time to verify deployment
+                    deployedAt: '2024-05-23T15:00:00Z', 
+                    configStatus: {
+                        WXCLIENT_ID: !!global.WXCLIENT_ID,
+                        WXCLIENT_SECRET: !!global.WXCLIENT_SECRET,
+                        CACLIENT_ID: !!global.CACLIENT_ID,
+                        CACLIENT_SECRET: !!global.CACLIENT_SECRET,
+                        WEBHOOK_URL: !!global.WEBHOOK_URL,
+                        IDLE_TIMER: global.IDLE_TIMER
+                    },
                     endpoints: {
                         health: 'GET /telephonic-signature/api/status',
                         pauseResume: 'POST /telephonic-signature/pauseResume',
@@ -282,7 +298,7 @@ async function routeToken(req, res, path, method) {
  * Route telephonic signature requests
  */
 async function routeTelephonicSignature(req, res, path, method) {
-    const { updateAgentDatabase } = require('./public/javascripts/db/agentsDb');
+    const { createAgentRecord, countRecordsByTaskId, getRecordsByTaskId, updateRecordTimestamp } = require('./public/javascripts/db/agentsDb');
     const { sendPauseResume } = require('./public/javascripts/api/webex');
 
     if (path === '/telephonic-signature/pauseResume' && method === 'POST') {
@@ -310,15 +326,24 @@ async function routeTelephonicSignature(req, res, path, method) {
 
         logger.info(`Processing TS request for taskId: ${taskId}`);
 
-        const dbResult = await updateAgentDatabase({ metadata });
+        // Determine which pair this is within the call (0-based)
+        const pairIndex = await countRecordsByTaskId(taskId);
+        logger.debug(`pairIndex for taskId ${taskId}: ${pairIndex}`);
 
-        if (!dbResult) {
-            res.status(400).json({
+        // Create a record with local time as a fallback; will be updated after the API call
+        const pauseSentAtMs = Date.now();
+        // Create a new record for this pause/resume pair
+        const recordId = await createAgentRecord({ ...metadata, taskId, pauseSentAtMs }, pairIndex);
+
+        if (!recordId) {
+            res.status(500).json({
                 success: false,
-                error: 'Database update Failed for taskid - ' + taskId
+                error: 'Failed to save record for taskId - ' + taskId
             });
             return;
         }
+
+        logger.debug(`Record created: recordId=${recordId} pairIndex=${pairIndex} pauseSentAtMs=${pauseSentAtMs}`);
 
         const sendResponse = await sendPauseResume(taskId);
 
@@ -331,13 +356,17 @@ async function routeTelephonicSignature(req, res, path, method) {
             return;
         }
 
-        logger.info(`Successfully sent pause/resume request for taskId: ${taskId}`);
+        // Update the record with the precise Cisco server timestamp for perfect segment matching
+        await updateRecordTimestamp(taskId, recordId, sendResponse.timestamp);
+
+        logger.info(`Successfully sent pause/resume for taskId: ${taskId} pairIndex: ${pairIndex}`);
 
         res.status(200).json({
             success: true,
             message: 'Call data processed successfully',
-            taskId: taskId,
-            timestamp: new Date().toISOString()
+            taskId,
+            recordId,
+            pairIndex
         });
 
     } else if (path === '/telephonic-signature/api/status' && method === 'GET') {
@@ -353,13 +382,11 @@ async function routeTelephonicSignature(req, res, path, method) {
 
     } else if (path.startsWith('/telephonic-signature/api/task/') && method === 'GET') {
         const taskId = path.split('/').pop();
-        const { getMetadata } = require('./public/javascripts/db/agentsDb');
+        logger.debug(`Retrieving task records for taskId: ${taskId}`);
 
-        logger.debug(`Retrieving task metadata for taskId: ${taskId}`);
+        const records = await getRecordsByTaskId(taskId);
 
-        const taskData = await getMetadata(taskId);
-
-        if (!taskData) {
+        if (!records || records.length === 0) {
             res.status(404).json({
                 success: false,
                 error: 'Task not found'
@@ -369,8 +396,9 @@ async function routeTelephonicSignature(req, res, path, method) {
 
         res.status(200).json({
             success: true,
-            taskId: taskId,
-            data: taskData
+            taskId,
+            recordCount: records.length,
+            data: records
         });
 
     } else {

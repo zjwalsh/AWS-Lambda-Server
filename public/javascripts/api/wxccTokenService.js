@@ -3,11 +3,12 @@ Updates the specific details in the database.
 Retrieves a new access and refresh token as needed.
  */
 const axios = require('axios');
-
 var logger=require('../../../log.js');
+const { dynamoDb } = require('../db/dynamodb.js');
+const { GetCommand, PutCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
 
+const TABLE_NAME = process.env.WX_TOKEN_TABLE_NAME;
 
-const { wxToken } = require('../../../models/wxToken');
 /**
  * $Call Webex API to get new Auth Token
  *
@@ -75,57 +76,63 @@ const getWXRefreshToken = async () => {
   };
   
 const getWXToken = async () => {
-  // Gets the Access Token from the database. This is not per org (yet). Can be extended if needed.
-  const token = await wxToken.findAll();
-  //   {
-  //   where: {
-  //     id: 1,
-  //   },
-  // });
-
-  if (token) return token;
-  else return {};
+  try {
+    const params = {
+      TableName: TABLE_NAME,
+      Key: { id: '1' }
+    };
+    const { Item } = await dynamoDb.send(new GetCommand(params));
+    return Item ? [Item] : [];
+  } catch (error) {
+    logger.error(`Error fetching WX token from DynamoDB: ${error.message}`);
+    return [];
+  }
 };
 
 const updateWXToken = async (token) => {
-  // Updates the existing Token in the Database
-  //let [accessToken, clusterId, orgId] = token.access_token.split('_');
-
-  const record = wxToken.upsert(
-    {
-      id: 1,
+  try {
+    const item = {
+      id: '1',
       access_token: token.access_token,
       expires_in: token.expires_in,
       refresh_token: token.refresh_token,
       refresh_token_expires_in: token.refresh_token_expires_in,
       token_type: token.token_type,
-      scope: token.scope
-    },
-    { returning: true }
-  );
-  return record;
+      scope: token.scope,
+      updatedAt: new Date().toISOString()
+    };
+    await dynamoDb.send(new PutCommand({
+      TableName: TABLE_NAME,
+      Item: item
+    }));
+    return item;
+  } catch (error) {
+    logger.error(`Error updating WX token in DynamoDB: ${error.message}`);
+    throw error;
+  }
 };
 
 const getWXAccessToken = async () => {
-  // Fetches the latest access Token if present in the database, else, it returns nothing.
   const token = await getWXToken();
-  let access_token = (await token[0].dataValues.access_token);
+  if (!token || token.length === 0) return null;
+  
+  let access_token = token[0].access_token;
   logger.debug(`Returning WX Access Token: ${access_token}`);
   return { access_token };
 };
 
-
 const wxDeleteAll = async() => {
-  
   try {
-    const retval = wxToken.truncate();
-    logger.debug(`Delete all records in WX Token database.`);
+    await dynamoDb.send(new DeleteCommand({
+      TableName: TABLE_NAME,
+      Key: { id: '1' }
+    }));
+    logger.debug(`Deleted WX Token record.`);
     return true;
   } catch (error) {
-    logger.error(`Error while updating WX DB: ${error}`);
+    logger.error(`Error deleting WX Token: ${error.message}`);
     return false;
   }
- 
 }
 
 module.exports = { getWXToken, updateWXToken, getWXAccessToken, getWXRefreshToken, wxDeleteAll };
