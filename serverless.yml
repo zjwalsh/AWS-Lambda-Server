@@ -36,7 +36,7 @@ provider:
   httpApi:
     cors:
       allowedOrigins:
-        - '*'
+        -        - '*'
       allowedHeaders:
         - Content-Type
         - Authorization
@@ -52,11 +52,8 @@ provider:
       allowCredentials: false
       maxAge: 3600
   
-  # Lambda layers for FFmpeg binary
-  # Note: FFmpeg layer temporarily disabled - application works without it
-  # Will add custom layer later: 
-  # layers:
-  #   - arn:aws:lambda:us-west-1:YOUR_ACCOUNT:layer:tsmiddleware-ffmpeg:1
+  layers:
+    - ${self:custom.ffmpegLayer.${self:provider.region}, self:custom.ffmpegLayer.default}
   
   # IAM Role for Lambda - Version 4 Syntax
   iam:

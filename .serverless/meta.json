@@ -28,7 +28,7 @@
         "artifactsS3KeyDirname": "serverless/dpss-ts-dev-middleware/dev/code-artifacts",
         "deploymentBucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
         "artifact": "C:\\Projects\\TS-Middleware\\server\\.serverless\\dpss-ts-dev-middleware.zip",
-        "artifactDirectoryName": "serverless/dpss-ts-dev-middleware/dev/1776374475110-2026-04-16T21:21:15.110Z"
+        "artifactDirectoryName": "serverless/dpss-ts-dev-middleware/dev/1776374918649-2026-04-16T21:28:38.649Z"
       },
       "provider": {
         "name": "aws",
@@ -42,13 +42,7 @@
         "httpApi": {
           "cors": {
             "allowedOrigins": [
-              "https://desktop.wxcc-us1.cisco.com",
-              "https://desktop.wxcc-eu1.cisco.com",
-              "https://desktop.wxcc-eu2.cisco.com",
-              "https://desktop.wxcc-anz1.cisco.com",
-              "https://desktop.wxcc-ca1.cisco.com",
-              "http://localhost:3000",
-              "http://localhost:8080"
+              "*"
             ],
             "allowedHeaders": [
               "Content-Type",
@@ -240,7 +234,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-                  "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776374475110-2026-04-16T21:21:15.110Z/dpss-ts-dev-middleware.zip"
+                  "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776374918649-2026-04-16T21:28:38.649Z/dpss-ts-dev-middleware.zip"
                 },
                 "Handler": "lambda.handler",
                 "Runtime": "nodejs22.x",
@@ -291,17 +285,17 @@
               ]
             },
             "TokenRefreshLambdaFunction": "<REDACTED>",
-            "ApiLambdaVersionWNqvUaJUKLkH4uF9ng7vUS9EA243Mbu0gye4sW4BJZY": {
+            "ApiLambdaVersionPGKdfP6dhXu7QDoQbRGbJAyDX3w3DXEVjoYrsKFamQ": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "ApiLambdaFunction"
                 },
-                "CodeSha256": "b74UV/gPcaqFFb/C4UzQr+YbEOzfOtAmqmGHooYDXAw="
+                "CodeSha256": "mXTimvJ9tVwtS1CthXft+3fZYO3pxA+glB537T5Qpyk="
               }
             },
-            "TokenRefreshLambdaVersionYHWr4c1CSg1pDOrfZ8GZda25ZUKVeV4weYxFfxcZg": "<REDACTED>",
+            "TokenRefreshLambdaVersionVteqHuknplEktu7uLRbvo2v4n857DkKunitrF0Kc": "<REDACTED>",
             "TokenRefreshEventsRuleSchedule1": "<REDACTED>",
             "TokenRefreshLambdaPermissionEventsRuleSchedule1": "<REDACTED>",
             "HttpApi": {
@@ -326,13 +320,7 @@
                     "OPTIONS"
                   ],
                   "AllowOrigins": [
-                    "https://desktop.wxcc-us1.cisco.com",
-                    "https://desktop.wxcc-eu1.cisco.com",
-                    "https://desktop.wxcc-eu2.cisco.com",
-                    "https://desktop.wxcc-anz1.cisco.com",
-                    "https://desktop.wxcc-ca1.cisco.com",
-                    "http://localhost:3000",
-                    "http://localhost:8080"
+                    "*"
                   ],
                   "MaxAge": 3600
                 }
@@ -766,7 +754,7 @@
             "ApiLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "ApiLambdaVersionWNqvUaJUKLkH4uF9ng7vUS9EA243Mbu0gye4sW4BJZY"
+                "Ref": "ApiLambdaVersionPGKdfP6dhXu7QDoQbRGbJAyDX3w3DXEVjoYrsKFamQ"
               },
               "Export": {
                 "Name": "sls-dpss-ts-dev-middleware-dev-ApiLambdaFunctionQualifiedArn"
@@ -951,7 +939,7 @@
           "memory": 1024,
           "runtime": "nodejs22.x",
           "vpc": {},
-          "versionLogicalId": "ApiLambdaVersionWNqvUaJUKLkH4uF9ng7vUS9EA243Mbu0gye4sW4BJZY"
+          "versionLogicalId": "ApiLambdaVersionPGKdfP6dhXu7QDoQbRGbJAyDX3w3DXEVjoYrsKFamQ"
         },
         "tokenRefresh": "<REDACTED>"
       },
@@ -1098,13 +1086,7 @@
       "httpApi": {
         "cors": {
           "allowedOrigins": [
-            "https://desktop.wxcc-us1.cisco.com",
-            "https://desktop.wxcc-eu1.cisco.com",
-            "https://desktop.wxcc-eu2.cisco.com",
-            "https://desktop.wxcc-anz1.cisco.com",
-            "https://desktop.wxcc-ca1.cisco.com",
-            "http://localhost:3000",
-            "http://localhost:8080"
+            "*"
           ],
           "allowedHeaders": [
             "Content-Type",
@@ -1296,7 +1278,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-                "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776374475110-2026-04-16T21:21:15.110Z/dpss-ts-dev-middleware.zip"
+                "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776374918649-2026-04-16T21:28:38.649Z/dpss-ts-dev-middleware.zip"
               },
               "Handler": "lambda.handler",
               "Runtime": "nodejs22.x",
@@ -1347,17 +1329,17 @@
             ]
           },
           "TokenRefreshLambdaFunction": "<REDACTED>",
-          "ApiLambdaVersionWNqvUaJUKLkH4uF9ng7vUS9EA243Mbu0gye4sW4BJZY": {
+          "ApiLambdaVersionPGKdfP6dhXu7QDoQbRGbJAyDX3w3DXEVjoYrsKFamQ": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "b74UV/gPcaqFFb/C4UzQr+YbEOzfOtAmqmGHooYDXAw="
+              "CodeSha256": "mXTimvJ9tVwtS1CthXft+3fZYO3pxA+glB537T5Qpyk="
             }
           },
-          "TokenRefreshLambdaVersionYHWr4c1CSg1pDOrfZ8GZda25ZUKVeV4weYxFfxcZg": "<REDACTED>",
+          "TokenRefreshLambdaVersionVteqHuknplEktu7uLRbvo2v4n857DkKunitrF0Kc": "<REDACTED>",
           "TokenRefreshEventsRuleSchedule1": "<REDACTED>",
           "TokenRefreshLambdaPermissionEventsRuleSchedule1": "<REDACTED>",
           "HttpApi": {
@@ -1382,13 +1364,7 @@
                   "OPTIONS"
                 ],
                 "AllowOrigins": [
-                  "https://desktop.wxcc-us1.cisco.com",
-                  "https://desktop.wxcc-eu1.cisco.com",
-                  "https://desktop.wxcc-eu2.cisco.com",
-                  "https://desktop.wxcc-anz1.cisco.com",
-                  "https://desktop.wxcc-ca1.cisco.com",
-                  "http://localhost:3000",
-                  "http://localhost:8080"
+                  "*"
                 ],
                 "MaxAge": 3600
               }
@@ -1822,7 +1798,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersionWNqvUaJUKLkH4uF9ng7vUS9EA243Mbu0gye4sW4BJZY"
+              "Ref": "ApiLambdaVersionPGKdfP6dhXu7QDoQbRGbJAyDX3w3DXEVjoYrsKFamQ"
             },
             "Export": {
               "Name": "sls-dpss-ts-dev-middleware-dev-ApiLambdaFunctionQualifiedArn"
@@ -1900,7 +1876,7 @@
       "serviceProvider": null,
       "instanceParameters": null
     },
-    "serviceRawFile": "service: dpss-ts-dev-middleware\r\n\r\nuseDotenv: true\r\n\r\ncustom:\r\n  # FFmpeg layer ARNs - Using community-maintained layers\r\n  ffmpegLayer:\r\n    us-east-1: arn:aws:lambda:us-east-1:145266761615:layer:ffmpeg:4\r\n    us-west-1: arn:aws:lambda:us-west-1:145266761615:layer:ffmpeg:4\r\n    us-west-2: arn:aws:lambda:us-west-2:145266761615:layer:ffmpeg:4\r\n    eu-west-1: arn:aws:lambda:eu-west-1:145266761615:layer:ffmpeg:4\r\n    eu-central-1: arn:aws:lambda:eu-central-1:145266761615:layer:ffmpeg:4\r\n    ap-southeast-1: arn:aws:lambda:ap-southeast-1:145266761615:layer:ffmpeg:4\r\n    ap-northeast-1: arn:aws:lambda:ap-northeast-1:145266761615:layer:ffmpeg:4\r\n    default: arn:aws:lambda:us-east-1:145266761615:layer:ffmpeg:4\r\n\r\npackage:\r\n  patterns:\r\n    - '!template.yaml'\r\n    - '!samconfig.toml'\r\n    - '!.aws-sam/**'\r\n    - '!.serverless/**'\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs22.x\r\n  region: us-west-2\r\n  stage: ${opt:stage, 'dev'}\r\n  profile: lac-customer\r\n  memorySize: 1024\r\n  timeout: 30\r\n  versionFunctions: true\r\n\r\n\r\n  # HTTP API CORS Configuration\r\n  httpApi:\r\n    cors:\r\n      allowedOrigins:\r\n        - https://desktop.wxcc-us1.cisco.com\r\n        - https://desktop.wxcc-eu1.cisco.com\r\n        - https://desktop.wxcc-eu2.cisco.com\r\n        - https://desktop.wxcc-anz1.cisco.com\r\n        - https://desktop.wxcc-ca1.cisco.com\r\n        - http://localhost:3000\r\n        - http://localhost:8080\r\n      allowedHeaders:\r\n        - Content-Type\r\n        - Authorization\r\n        - X-Amz-Date\r\n        - X-Api-Key\r\n        - X-Amz-Security-Token\r\n      allowedMethods:\r\n        - GET\r\n        - POST\r\n        - PUT\r\n        - DELETE\r\n        - OPTIONS\r\n      allowCredentials: false\r\n      maxAge: 3600\r\n  \r\n  # Lambda layers for FFmpeg binary\r\n  # Note: FFmpeg layer temporarily disabled - application works without it\r\n  # Will add custom layer later: \r\n  # layers:\r\n  #   - arn:aws:lambda:us-west-1:YOUR_ACCOUNT:layer:tsmiddleware-ffmpeg:1\r\n  \r\n  # IAM Role for Lambda - Version 4 Syntax\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - dynamodb:Query\r\n            - dynamodb:Scan\r\n            - dynamodb:GetItem\r\n            - dynamodb:PutItem\r\n            - dynamodb:UpdateItem\r\n            - dynamodb:DeleteItem\r\n          Resource: \r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-${self:provider.stage}-*\"\r\n        - Effect: Allow\r\n          Action:\r\n            - logs:CreateLogGroup\r\n            - logs:CreateLogStream\r\n            - logs:PutLogEvents\r\n          Resource: \"*\"\r\n\r\n  # Environment variables\r\n  environment:\r\n    LOG_LEVEL: ${env:LOG_LEVEL, 'INFO'}\r\n    AGENTS_TABLE_NAME: !Ref AgentsTable\r\n    CAPTURES_TABLE_NAME: !Ref CapturesTable\r\n    SUBSCRIPTIONS_TABLE_NAME: !Ref SubscriptionsTable\r\n    WX_TOKEN_TABLE_NAME: !Ref WxTokenTable\r\n    CAWS_TOKEN_TABLE_NAME: !Ref CawsTokenTable\r\n    # AWS_REGION is automatically available in Lambda environment\r\n    \r\n    # Webex Configuration\r\n    WXCLIENT_ID: ${env:WXCLIENT_ID, ''}\r\n    WXCLIENT_SECRET: ${env:WXCLIENT_SECRET, ''}\r\n    WXCLIENT_ORGID: ${env:WXCLIENT_ORGID, ''}\r\n    WXAUTH_URL: ${env:WXAUTH_URL, ''}\r\n    WXCC_WEBHOOK_SECRET: ${env:WXCC_WEBHOOK_SECRET, ''}\r\n    WXCC_REFRESH_TOKEN: ${env:WXCC_REFRESH_TOKEN, ''}\r\n    \r\n    # CA Configuration\r\n    CACLIENT_ID: ${env:CACLIENT_ID, ''}\r\n    CACLIENT_SECRET: ${env:CACLIENT_SECRET, ''}\r\n    CACLIENT_SCOPE: ${env:CACLIENT_SCOPE, ''}\r\n    CACASEURL: ${env:CACASEURL, ''}\r\n    CASTOREURL: ${env:CASTOREURL, ''}\r\n    CAAUTH_URL: ${env:CAAUTH_URL, ''}\r\n    \r\n    # Other Configuration\r\n    WEBHOOK_URL: ${env:WEBHOOK_URL, ''}\r\n    IDLE_TIMER: ${env:IDLE_TIMER, '0'}\r\n    \r\n    # FFmpeg Configuration for Lambda Layer\r\n    FFMPEG_PATH: /opt/bin/ffmpeg\r\n    FFPROBE_PATH: /opt/bin/ffprobe\r\n\r\nfunctions:\r\n  api:\r\n    handler: lambda.handler\r\n    memorySize: 1024 # Increased memory for FFmpeg processing\r\n    timeout: 29      # Adjusted to match HTTP API maximum 29s timeout\r\n    events:\r\n      # API Gateway endpoints\r\n      - httpApi:\r\n          path: /\r\n          method: GET\r\n      \r\n      # Webhook endpoints\r\n      - httpApi:\r\n          path: /webhook/webhook\r\n          method: POST\r\n      - httpApi:\r\n          path: /webhook/status\r\n          method: GET\r\n      - httpApi:\r\n          path: /webhook/subscribe\r\n          method: GET\r\n      - httpApi:\r\n          path: /webhook/unsubscribe\r\n          method: GET\r\n      \r\n      # Token endpoints\r\n      - httpApi:\r\n          path: /token/{proxy+}\r\n          method: ANY\r\n      \r\n      # Telephonic Signature endpoints\r\n      - httpApi:\r\n          path: /telephonic-signature/pauseResume\r\n          method: POST\r\n      - httpApi:\r\n          path: /telephonic-signature/api/status\r\n          method: GET\r\n      - httpApi:\r\n          path: /telephonic-signature/api/task/{taskId}\r\n          method: GET\r\n      \r\n      # Database test endpoints\r\n      - httpApi:\r\n          path: /test/database\r\n          method: GET\r\n      - httpApi:\r\n          path: /test/tables\r\n          method: GET\r\n      # Audio conversion test endpoint\r\n      - httpApi:\r\n          path: /test/audio-check\r\n          method: GET\r\n      \r\n      # Recording log endpoint - query agent calls by date range\r\n      - httpApi:\r\n          path: /recording-log\r\n          method: GET\r\n\r\n  # Token refresh function - triggered by EventBridge every 15 minutes\r\n  tokenRefresh:\r\n    handler: token-refresh.handler\r\n    description: Refreshes WX and CA tokens periodically\r\n    memorySize: 256\r\n    timeout: 60\r\n    events:\r\n      - schedule:\r\n          rate: rate(15 minutes)\r\n          enabled: true\r\n          description: 'Refresh WX and CA tokens every 15 minutes'\r\n\r\nresources:\r\n  Resources:\r\n    # Agents DynamoDB Table\r\n    # Composite key: taskId (partition) + recordId (sort)\r\n    # Each pause/resume pair is a separate item; all pairs for a call share the same taskId.\r\n    AgentsTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:service}-${self:provider.stage}-Agents\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: taskId\r\n            AttributeType: S\r\n          - AttributeName: recordId\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: taskId\r\n            KeyType: HASH\r\n          - AttributeName: recordId\r\n            KeyType: RANGE\r\n        Tags:\r\n          - Key: Environment\r\n            Value: ${self:provider.stage}\r\n          - Key: Service\r\n            Value: ${self:service}\r\n\r\n    # Captures DynamoDB Table\r\n    CapturesTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:service}-${self:provider.stage}-Captures\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: taskId\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: taskId\r\n            KeyType: HASH\r\n        Tags:\r\n          - Key: Environment\r\n            Value: ${self:provider.stage}\r\n          - Key: Service\r\n            Value: ${self:service}\r\n\r\n    # Subscriptions DynamoDB Table\r\n    SubscriptionsTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:service}-${self:provider.stage}-Subscriptions\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: id\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: id\r\n            KeyType: HASH\r\n        Tags:\r\n          - Key: Environment\r\n            Value: ${self:provider.stage}\r\n          - Key: Service\r\n            Value: ${self:service}\r\n\r\n    # WxToken DynamoDB Table\r\n    WxTokenTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:service}-${self:provider.stage}-WxToken\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: id\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: id\r\n            KeyType: HASH\r\n        Tags:\r\n          - Key: Environment\r\n            Value: ${self:provider.stage}\r\n          - Key: Service\r\n            Value: ${self:service}\r\n\r\n    # CawsToken DynamoDB Table\r\n    CawsTokenTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:service}-${self:provider.stage}-CawsToken\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: id\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: id\r\n            KeyType: HASH\r\n        Tags:\r\n          - Key: Environment\r\n            Value: ${self:provider.stage}\r\n          - Key: Service\r\n            Value: ${self:service}\r\n\r\n  Outputs:\r\n    ApiUrl:\r\n      Description: API Gateway URL\r\n      Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com\r\n    \r\n    AgentsTableName:\r\n      Description: Agents DynamoDB Table Name\r\n      Value: !Ref AgentsTable\r\n    \r\n    CapturesTableName:\r\n      Description: Captures DynamoDB Table Name\r\n      Value: !Ref CapturesTable\r\n    \r\n    SubscriptionsTableName:\r\n      Description: Subscriptions DynamoDB Table Name\r\n      Value: !Ref SubscriptionsTable\r\n\r\nplugins:\r\n  - serverless-offline\r\n",
+    "serviceRawFile": "service: dpss-ts-dev-middleware\r\n\r\nuseDotenv: true\r\n\r\ncustom:\r\n  # FFmpeg layer ARNs - Using community-maintained layers\r\n  ffmpegLayer:\r\n    us-east-1: arn:aws:lambda:us-east-1:145266761615:layer:ffmpeg:4\r\n    us-west-1: arn:aws:lambda:us-west-1:145266761615:layer:ffmpeg:4\r\n    us-west-2: arn:aws:lambda:us-west-2:145266761615:layer:ffmpeg:4\r\n    eu-west-1: arn:aws:lambda:eu-west-1:145266761615:layer:ffmpeg:4\r\n    eu-central-1: arn:aws:lambda:eu-central-1:145266761615:layer:ffmpeg:4\r\n    ap-southeast-1: arn:aws:lambda:ap-southeast-1:145266761615:layer:ffmpeg:4\r\n    ap-northeast-1: arn:aws:lambda:ap-northeast-1:145266761615:layer:ffmpeg:4\r\n    default: arn:aws:lambda:us-east-1:145266761615:layer:ffmpeg:4\r\n\r\npackage:\r\n  patterns:\r\n    - '!template.yaml'\r\n    - '!samconfig.toml'\r\n    - '!.aws-sam/**'\r\n    - '!.serverless/**'\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs22.x\r\n  region: us-west-2\r\n  stage: ${opt:stage, 'dev'}\r\n  profile: lac-customer\r\n  memorySize: 1024\r\n  timeout: 30\r\n  versionFunctions: true\r\n\r\n\r\n  # HTTP API CORS Configuration\r\n  httpApi:\r\n    cors:\r\n      allowedOrigins:\r\n        - '*'\r\n      allowedHeaders:\r\n        - Content-Type\r\n        - Authorization\r\n        - X-Amz-Date\r\n        - X-Api-Key\r\n        - X-Amz-Security-Token\r\n      allowedMethods:\r\n        - GET\r\n        - POST\r\n        - PUT\r\n        - DELETE\r\n        - OPTIONS\r\n      allowCredentials: false\r\n      maxAge: 3600\r\n  \r\n  # Lambda layers for FFmpeg binary\r\n  # Note: FFmpeg layer temporarily disabled - application works without it\r\n  # Will add custom layer later: \r\n  # layers:\r\n  #   - arn:aws:lambda:us-west-1:YOUR_ACCOUNT:layer:tsmiddleware-ffmpeg:1\r\n  \r\n  # IAM Role for Lambda - Version 4 Syntax\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - dynamodb:Query\r\n            - dynamodb:Scan\r\n            - dynamodb:GetItem\r\n            - dynamodb:PutItem\r\n            - dynamodb:UpdateItem\r\n            - dynamodb:DeleteItem\r\n          Resource: \r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-${self:provider.stage}-*\"\r\n        - Effect: Allow\r\n          Action:\r\n            - logs:CreateLogGroup\r\n            - logs:CreateLogStream\r\n            - logs:PutLogEvents\r\n          Resource: \"*\"\r\n\r\n  # Environment variables\r\n  environment:\r\n    LOG_LEVEL: ${env:LOG_LEVEL, 'INFO'}\r\n    AGENTS_TABLE_NAME: !Ref AgentsTable\r\n    CAPTURES_TABLE_NAME: !Ref CapturesTable\r\n    SUBSCRIPTIONS_TABLE_NAME: !Ref SubscriptionsTable\r\n    WX_TOKEN_TABLE_NAME: !Ref WxTokenTable\r\n    CAWS_TOKEN_TABLE_NAME: !Ref CawsTokenTable\r\n    # AWS_REGION is automatically available in Lambda environment\r\n    \r\n    # Webex Configuration\r\n    WXCLIENT_ID: ${env:WXCLIENT_ID, ''}\r\n    WXCLIENT_SECRET: ${env:WXCLIENT_SECRET, ''}\r\n    WXCLIENT_ORGID: ${env:WXCLIENT_ORGID, ''}\r\n    WXAUTH_URL: ${env:WXAUTH_URL, ''}\r\n    WXCC_WEBHOOK_SECRET: ${env:WXCC_WEBHOOK_SECRET, ''}\r\n    WXCC_REFRESH_TOKEN: ${env:WXCC_REFRESH_TOKEN, ''}\r\n    \r\n    # CA Configuration\r\n    CACLIENT_ID: ${env:CACLIENT_ID, ''}\r\n    CACLIENT_SECRET: ${env:CACLIENT_SECRET, ''}\r\n    CACLIENT_SCOPE: ${env:CACLIENT_SCOPE, ''}\r\n    CACASEURL: ${env:CACASEURL, ''}\r\n    CASTOREURL: ${env:CASTOREURL, ''}\r\n    CAAUTH_URL: ${env:CAAUTH_URL, ''}\r\n    \r\n    # Other Configuration\r\n    WEBHOOK_URL: ${env:WEBHOOK_URL, ''}\r\n    IDLE_TIMER: ${env:IDLE_TIMER, '0'}\r\n    \r\n    # FFmpeg Configuration for Lambda Layer\r\n    FFMPEG_PATH: /opt/bin/ffmpeg\r\n    FFPROBE_PATH: /opt/bin/ffprobe\r\n\r\nfunctions:\r\n  api:\r\n    handler: lambda.handler\r\n    memorySize: 1024 # Increased memory for FFmpeg processing\r\n    timeout: 29      # Adjusted to match HTTP API maximum 29s timeout\r\n    events:\r\n      # API Gateway endpoints\r\n      - httpApi:\r\n          path: /\r\n          method: GET\r\n      \r\n      # Webhook endpoints\r\n      - httpApi:\r\n          path: /webhook/webhook\r\n          method: POST\r\n      - httpApi:\r\n          path: /webhook/status\r\n          method: GET\r\n      - httpApi:\r\n          path: /webhook/subscribe\r\n          method: GET\r\n      - httpApi:\r\n          path: /webhook/unsubscribe\r\n          method: GET\r\n      \r\n      # Token endpoints\r\n      - httpApi:\r\n          path: /token/{proxy+}\r\n          method: ANY\r\n      \r\n      # Telephonic Signature endpoints\r\n      - httpApi:\r\n          path: /telephonic-signature/pauseResume\r\n          method: POST\r\n      - httpApi:\r\n          path: /telephonic-signature/api/status\r\n          method: GET\r\n      - httpApi:\r\n          path: /telephonic-signature/api/task/{taskId}\r\n          method: GET\r\n      \r\n      # Database test endpoints\r\n      - httpApi:\r\n          path: /test/database\r\n          method: GET\r\n      - httpApi:\r\n          path: /test/tables\r\n          method: GET\r\n      # Audio conversion test endpoint\r\n      - httpApi:\r\n          path: /test/audio-check\r\n          method: GET\r\n      \r\n      # Recording log endpoint - query agent calls by date range\r\n      - httpApi:\r\n          path: /recording-log\r\n          method: GET\r\n\r\n  # Token refresh function - triggered by EventBridge every 15 minutes\r\n  tokenRefresh:\r\n    handler: token-refresh.handler\r\n    description: Refreshes WX and CA tokens periodically\r\n    memorySize: 256\r\n    timeout: 60\r\n    events:\r\n      - schedule:\r\n          rate: rate(15 minutes)\r\n          enabled: true\r\n          description: 'Refresh WX and CA tokens every 15 minutes'\r\n\r\nresources:\r\n  Resources:\r\n    # Agents DynamoDB Table\r\n    # Composite key: taskId (partition) + recordId (sort)\r\n    # Each pause/resume pair is a separate item; all pairs for a call share the same taskId.\r\n    AgentsTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:service}-${self:provider.stage}-Agents\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: taskId\r\n            AttributeType: S\r\n          - AttributeName: recordId\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: taskId\r\n            KeyType: HASH\r\n          - AttributeName: recordId\r\n            KeyType: RANGE\r\n        Tags:\r\n          - Key: Environment\r\n            Value: ${self:provider.stage}\r\n          - Key: Service\r\n            Value: ${self:service}\r\n\r\n    # Captures DynamoDB Table\r\n    CapturesTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:service}-${self:provider.stage}-Captures\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: taskId\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: taskId\r\n            KeyType: HASH\r\n        Tags:\r\n          - Key: Environment\r\n            Value: ${self:provider.stage}\r\n          - Key: Service\r\n            Value: ${self:service}\r\n\r\n    # Subscriptions DynamoDB Table\r\n    SubscriptionsTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:service}-${self:provider.stage}-Subscriptions\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: id\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: id\r\n            KeyType: HASH\r\n        Tags:\r\n          - Key: Environment\r\n            Value: ${self:provider.stage}\r\n          - Key: Service\r\n            Value: ${self:service}\r\n\r\n    # WxToken DynamoDB Table\r\n    WxTokenTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:service}-${self:provider.stage}-WxToken\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: id\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: id\r\n            KeyType: HASH\r\n        Tags:\r\n          - Key: Environment\r\n            Value: ${self:provider.stage}\r\n          - Key: Service\r\n            Value: ${self:service}\r\n\r\n    # CawsToken DynamoDB Table\r\n    CawsTokenTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:service}-${self:provider.stage}-CawsToken\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: id\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: id\r\n            KeyType: HASH\r\n        Tags:\r\n          - Key: Environment\r\n            Value: ${self:provider.stage}\r\n          - Key: Service\r\n            Value: ${self:service}\r\n\r\n  Outputs:\r\n    ApiUrl:\r\n      Description: API Gateway URL\r\n      Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com\r\n    \r\n    AgentsTableName:\r\n      Description: Agents DynamoDB Table Name\r\n      Value: !Ref AgentsTable\r\n    \r\n    CapturesTableName:\r\n      Description: Captures DynamoDB Table Name\r\n      Value: !Ref CapturesTable\r\n    \r\n    SubscriptionsTableName:\r\n      Description: Subscriptions DynamoDB Table Name\r\n      Value: !Ref SubscriptionsTable\r\n\r\nplugins:\r\n  - serverless-offline\r\n",
     "command": [
       "deploy"
     ],
@@ -1913,7 +1889,7 @@
     "serviceProviderAwsCfStackName": "dpss-ts-dev-middleware-dev",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-west-2:025217829020:stack/dpss-ts-dev-middleware-dev/6cc13a50-379a-11f1-8512-024865a37073",
     "serviceProviderAwsCfStackCreated": "2026-04-14T00:39:41.546Z",
-    "serviceProviderAwsCfStackUpdated": "2026-04-14T22:56:14.671Z",
+    "serviceProviderAwsCfStackUpdated": "2026-04-16T21:21:23.434Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
@@ -1928,7 +1904,7 @@
       },
       {
         "OutputKey": "ApiLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:us-west-2:025217829020:function:dpss-ts-dev-middleware-dev-api:22",
+        "OutputValue": "arn:aws:lambda:us-west-2:025217829020:function:dpss-ts-dev-middleware-dev-api:23",
         "Description": "Current Lambda function version",
         "ExportName": "sls-dpss-ts-dev-middleware-dev-ApiLambdaFunctionQualifiedArn"
       },
@@ -1950,7 +1926,7 @@
       },
       {
         "OutputKey": "TokenRefreshLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:us-west-2:025217829020:function:dpss-ts-dev-middleware-dev-tokenRefresh:22",
+        "OutputValue": "arn:aws:lambda:us-west-2:025217829020:function:dpss-ts-dev-middleware-dev-tokenRefresh:23",
         "Description": "Current Lambda function version",
         "ExportName": "sls-dpss-ts-dev-middleware-dev-TokenRefreshLambdaFunctionQualifiedArn"
       },
@@ -2081,7 +2057,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-              "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776374475110-2026-04-16T21:21:15.110Z/dpss-ts-dev-middleware.zip"
+              "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776374918649-2026-04-16T21:28:38.649Z/dpss-ts-dev-middleware.zip"
             },
             "Handler": "lambda.handler",
             "Runtime": "nodejs22.x",
@@ -2132,17 +2108,17 @@
           ]
         },
         "TokenRefreshLambdaFunction": "<REDACTED>",
-        "ApiLambdaVersionWNqvUaJUKLkH4uF9ng7vUS9EA243Mbu0gye4sW4BJZY": {
+        "ApiLambdaVersionPGKdfP6dhXu7QDoQbRGbJAyDX3w3DXEVjoYrsKFamQ": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "ApiLambdaFunction"
             },
-            "CodeSha256": "b74UV/gPcaqFFb/C4UzQr+YbEOzfOtAmqmGHooYDXAw="
+            "CodeSha256": "mXTimvJ9tVwtS1CthXft+3fZYO3pxA+glB537T5Qpyk="
           }
         },
-        "TokenRefreshLambdaVersionYHWr4c1CSg1pDOrfZ8GZda25ZUKVeV4weYxFfxcZg": "<REDACTED>",
+        "TokenRefreshLambdaVersionVteqHuknplEktu7uLRbvo2v4n857DkKunitrF0Kc": "<REDACTED>",
         "TokenRefreshEventsRuleSchedule1": "<REDACTED>",
         "TokenRefreshLambdaPermissionEventsRuleSchedule1": "<REDACTED>",
         "HttpApi": {
@@ -2166,13 +2142,7 @@
                 "OPTIONS"
               ],
               "AllowOrigins": [
-                "https://desktop.wxcc-us1.cisco.com",
-                "https://desktop.wxcc-eu1.cisco.com",
-                "https://desktop.wxcc-eu2.cisco.com",
-                "https://desktop.wxcc-anz1.cisco.com",
-                "https://desktop.wxcc-ca1.cisco.com",
-                "http://localhost:3000",
-                "http://localhost:8080"
+                "*"
               ],
               "MaxAge": 3600
             }
@@ -2606,7 +2576,7 @@
         "ApiLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "ApiLambdaVersionWNqvUaJUKLkH4uF9ng7vUS9EA243Mbu0gye4sW4BJZY"
+            "Ref": "ApiLambdaVersionPGKdfP6dhXu7QDoQbRGbJAyDX3w3DXEVjoYrsKFamQ"
           },
           "Export": {
             "Name": "sls-dpss-ts-dev-middleware-dev-ApiLambdaFunctionQualifiedArn"

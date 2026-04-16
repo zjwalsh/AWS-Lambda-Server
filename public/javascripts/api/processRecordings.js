@@ -127,7 +127,7 @@ function matchRecordingsToRecords(recordings, records) {
  * download WAV, convert to MP3, get case UUID, upload to CalSAWS, update DB.
  */
 async function processOnePair(recording, record, taskId) {
-  const { recordId, caseNumber, pairIndex } = record;
+  const { recordId, caseNumber, firstName, lastName, pairIndex } = record;
   const wavUrl = recording.attributes.filePath;
   const fileName = recording.attributes.fileName;
   const wavPath = path.join('/tmp', fileName);
@@ -169,7 +169,7 @@ async function processOnePair(recording, record, taskId) {
 
     // Upload MP3 to CalSAWS
     logger.debug(curModual + 'Uploading MP3 to CalSAWS');
-    const documentumId = await uploadFile(mp3Path, caseNumber, caseUUID, taskId);
+    const documentumId = await uploadFile(mp3Path, caseNumber, caseUUID, firstName, lastName, taskId);
 
     // Update DB record with result
     await updateAgentFields(taskId, { documentumid: documentumId, caseUUID, status: 'processed' });
@@ -348,7 +348,7 @@ async function getCaseUUID(caseNumber, taskId) {
   }
 }
 
-async function uploadFile(filePath, caseNumber, caseUUID, taskId) {
+async function uploadFile(filePath, caseNumber, caseUUID, firstName, lastName, taskId) {
   const form = new FormData();
   const accessToken = await getCAAccessToken();
 
@@ -356,18 +356,20 @@ async function uploadFile(filePath, caseNumber, caseUUID, taskId) {
     keys: {
       drawer: "External Staging",
       field1: caseUUID,
-      field2: null,
-      field3: "E-APP",
+      field2: caseNumber,
+      field3: `${firstName || ''} ${lastName || ''}`.trim(),
       field4: null,
       field5: "TELE_SIG_DEC",
       documentType: "Telephonic Signature Declaration",
       notes: null,
       customKeys: [
-        { name: "E-Application Number", value: caseNumber },
+        { name: "E-Application Number", value: null },
         { name: "County Code", value: "19" },
         { name: "Document Type", value: "Authorized Rep and Release of Info" },
+        { name: "Document Scope", value: "case" },
         { name: "Capture Information", value: "Telephonic Signature" },
-        { name: "Time Sensitive", value: "false" }
+        { name: "Time Sensitive", value: "false" },
+        { name: "Confidential", value: "false" }
       ]
     }
   };
