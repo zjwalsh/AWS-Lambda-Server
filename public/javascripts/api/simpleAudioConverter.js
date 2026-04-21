@@ -4,7 +4,7 @@
  */
 
 const fs = require('fs');
-const lamejs = require('lamejs');
+const lamejs = require('@breezystack/lamejs');
 const logger = require('../../../log.js');
 
 // ITU-T G.711 µ-law decode: 8-bit ulaw sample → 16-bit linear PCM

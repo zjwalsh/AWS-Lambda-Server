@@ -36,9 +36,6 @@
           "maxAge": 3600
         }
       },
-      "layers": [
-        "arn:aws:lambda:us-west-2:145266761615:layer:ffmpeg:4"
-      ],
       "iam": {
         "role": {
           "statements": [
@@ -205,7 +202,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-                "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776783472300-2026-04-21T14:57:52.300Z/dpss-ts-dev-middleware.zip"
+                "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776783661853-2026-04-21T15:01:01.853Z/dpss-ts-dev-middleware.zip"
               },
               "Handler": "lambda.handler",
               "Runtime": "nodejs22.x",
@@ -253,10 +250,7 @@
                   "IamRoleLambdaExecution",
                   "Arn"
                 ]
-              },
-              "Layers": [
-                "arn:aws:lambda:us-west-2:145266761615:layer:ffmpeg:4"
-              ]
+              }
             },
             "DependsOn": [
               "ApiLogGroup"
@@ -267,7 +261,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-                "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776783472300-2026-04-21T14:57:52.300Z/dpss-ts-dev-middleware.zip"
+                "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776783661853-2026-04-21T15:01:01.853Z/dpss-ts-dev-middleware.zip"
               },
               "Handler": "token-refresh.handler",
               "Runtime": "nodejs22.x",
@@ -316,33 +310,30 @@
                   "IamRoleLambdaExecution",
                   "Arn"
                 ]
-              },
-              "Layers": [
-                "arn:aws:lambda:us-west-2:145266761615:layer:ffmpeg:4"
-              ]
+              }
             },
             "DependsOn": [
               "TokenRefreshLogGroup"
             ]
           },
-          "ApiLambdaVersionQme4zOE74LjDObn5qQmwambjuKKAVkuFcHJoxM63y8": {
+          "ApiLambdaVersionsdjvaRg2wwpYB59ks3vh8x43U1aSjNv5s0RgVEt0": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "9qlvdM/f/1+9J2iXgxwkRGAfBpv1xbOMf+ERe4gAjy0="
+              "CodeSha256": "le3975JbA93wSlSuoaYxD86ZN0pCqEfiUe2kgw34rcw="
             }
           },
-          "TokenRefreshLambdaVersionH1QLhnefsRvy6LsEcxFVoF2bpQ2YCS82OmkGeUaLiw": {
+          "TokenRefreshLambdaVersionqr3FRQNvbBjELRHADxXVbkYPvyXLHsWa8C0uormkrQ": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "TokenRefreshLambdaFunction"
               },
-              "CodeSha256": "9qlvdM/f/1+9J2iXgxwkRGAfBpv1xbOMf+ERe4gAjy0=",
+              "CodeSha256": "le3975JbA93wSlSuoaYxD86ZN0pCqEfiUe2kgw34rcw=",
               "Description": "Refreshes WX and CA tokens periodically"
             }
           },
@@ -912,7 +903,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersionQme4zOE74LjDObn5qQmwambjuKKAVkuFcHJoxM63y8"
+              "Ref": "ApiLambdaVersionsdjvaRg2wwpYB59ks3vh8x43U1aSjNv5s0RgVEt0"
             },
             "Export": {
               "Name": "sls-dpss-ts-dev-middleware-dev-ApiLambdaFunctionQualifiedArn"
@@ -921,7 +912,7 @@
           "TokenRefreshLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "TokenRefreshLambdaVersionH1QLhnefsRvy6LsEcxFVoF2bpQ2YCS82OmkGeUaLiw"
+              "Ref": "TokenRefreshLambdaVersionqr3FRQNvbBjELRHADxXVbkYPvyXLHsWa8C0uormkrQ"
             },
             "Export": {
               "Name": "sls-dpss-ts-dev-middleware-dev-TokenRefreshLambdaFunctionQualifiedArn"
@@ -1121,7 +1112,7 @@
         "memory": 1024,
         "runtime": "nodejs22.x",
         "vpc": {},
-        "versionLogicalId": "ApiLambdaVersionQme4zOE74LjDObn5qQmwambjuKKAVkuFcHJoxM63y8"
+        "versionLogicalId": "ApiLambdaVersionsdjvaRg2wwpYB59ks3vh8x43U1aSjNv5s0RgVEt0"
       },
       "tokenRefresh": {
         "handler": "token-refresh.handler",
@@ -1144,7 +1135,7 @@
         "memory": 256,
         "runtime": "nodejs22.x",
         "vpc": {},
-        "versionLogicalId": "TokenRefreshLambdaVersionH1QLhnefsRvy6LsEcxFVoF2bpQ2YCS82OmkGeUaLiw"
+        "versionLogicalId": "TokenRefreshLambdaVersionqr3FRQNvbBjELRHADxXVbkYPvyXLHsWa8C0uormkrQ"
       }
     },
     "resources": {
@@ -1348,7 +1339,7 @@
         "artifactsS3KeyDirname": "serverless/dpss-ts-dev-middleware/dev/code-artifacts",
         "deploymentBucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
         "artifact": "C:\\Projects\\TS-Middleware\\server\\.serverless\\dpss-ts-dev-middleware.zip",
-        "artifactDirectoryName": "serverless/dpss-ts-dev-middleware/dev/1776783472300-2026-04-21T14:57:52.300Z"
+        "artifactDirectoryName": "serverless/dpss-ts-dev-middleware/dev/1776783661853-2026-04-21T15:01:01.853Z"
       },
       "provider": {
         "$ref": "$[\"service\"][\"provider\"]"
@@ -1369,7 +1360,7 @@
     "artifact": "C:\\Projects\\TS-Middleware\\server\\.serverless\\dpss-ts-dev-middleware.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/dpss-ts-dev-middleware/dev/1776783472300-2026-04-21T14:57:52.300Z",
+    "artifactDirectoryName": "serverless/dpss-ts-dev-middleware/dev/1776783661853-2026-04-21T15:01:01.853Z",
     "artifact": "dpss-ts-dev-middleware.zip"
   }
 }
