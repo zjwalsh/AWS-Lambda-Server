@@ -354,7 +354,7 @@ async function uploadFile(filePath, caseNumber, caseUUID, firstName, lastName, t
 
   const infoData = {
     keys: {
-      drawer: "External Staging",
+      drawer: "Los Angeles Case",
       field1: caseUUID,
       field2: caseNumber,
       field3: `${firstName || ''} ${lastName || ''}`.trim(),
@@ -370,7 +370,6 @@ async function uploadFile(filePath, caseNumber, caseUUID, firstName, lastName, t
         { name: "Capture Information", value: "Telephonic Signature" },
         { name: "Time Sensitive", value: "false" },
         { name: "Confidential", value: "false" },
-        { name: "drawer", value: "Los Angeles Case" }
       ]
     }
   };

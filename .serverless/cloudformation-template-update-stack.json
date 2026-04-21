@@ -118,7 +118,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776786693369-2026-04-21T15:51:33.369Z/dpss-ts-dev-middleware.zip"
+          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776787097095-2026-04-21T15:58:17.095Z/dpss-ts-dev-middleware.zip"
         },
         "Handler": "lambda.handler",
         "Runtime": "nodejs22.x",
@@ -177,7 +177,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776786693369-2026-04-21T15:51:33.369Z/dpss-ts-dev-middleware.zip"
+          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776787097095-2026-04-21T15:58:17.095Z/dpss-ts-dev-middleware.zip"
         },
         "Handler": "token-refresh.handler",
         "Runtime": "nodejs22.x",
