@@ -118,7 +118,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776787097095-2026-04-21T15:58:17.095Z/dpss-ts-dev-middleware.zip"
+          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776788106610-2026-04-21T16:15:06.610Z/dpss-ts-dev-middleware.zip"
         },
         "Handler": "lambda.handler",
         "Runtime": "nodejs22.x",
@@ -177,7 +177,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776787097095-2026-04-21T15:58:17.095Z/dpss-ts-dev-middleware.zip"
+          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776788106610-2026-04-21T16:15:06.610Z/dpss-ts-dev-middleware.zip"
         },
         "Handler": "token-refresh.handler",
         "Runtime": "nodejs22.x",
@@ -232,24 +232,24 @@
         "TokenRefreshLogGroup"
       ]
     },
-    "ApiLambdaVersionMPAeKN17cRyFt9k4DMeGK4s62f7a3Ac84nN0RNh7Gc": {
+    "ApiLambdaVersionyN4L1c9lkHXx2pftC2fQN65SZPuHUNGRyzRQNm611Q": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "ApiLambdaFunction"
         },
-        "CodeSha256": "1xTbRkJS1pmyrRiirnU+6gK2g9ptvo+bQb4Q0yzHQug="
+        "CodeSha256": "8OGlDuLgord6ceWWh4Rdkw4MLphXprL3bfdQLxhoJLE="
       }
     },
-    "TokenRefreshLambdaVersionjixYHTzRfGDW0ZTjMqnknAMkWgzSYvqdxMs4IXqulY": {
+    "TokenRefreshLambdaVersioncWqRSpHJbp0WWwqyUBZSZhLLRyRXfWLw2UGM9gBYs": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "TokenRefreshLambdaFunction"
         },
-        "CodeSha256": "1xTbRkJS1pmyrRiirnU+6gK2g9ptvo+bQb4Q0yzHQug=",
+        "CodeSha256": "8OGlDuLgord6ceWWh4Rdkw4MLphXprL3bfdQLxhoJLE=",
         "Description": "Refreshes WX and CA tokens periodically"
       }
     },
@@ -822,7 +822,7 @@
     "ApiLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "ApiLambdaVersionMPAeKN17cRyFt9k4DMeGK4s62f7a3Ac84nN0RNh7Gc"
+        "Ref": "ApiLambdaVersionyN4L1c9lkHXx2pftC2fQN65SZPuHUNGRyzRQNm611Q"
       },
       "Export": {
         "Name": "sls-dpss-ts-dev-middleware-dev-ApiLambdaFunctionQualifiedArn"
@@ -831,7 +831,7 @@
     "TokenRefreshLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "TokenRefreshLambdaVersionjixYHTzRfGDW0ZTjMqnknAMkWgzSYvqdxMs4IXqulY"
+        "Ref": "TokenRefreshLambdaVersioncWqRSpHJbp0WWwqyUBZSZhLLRyRXfWLw2UGM9gBYs"
       },
       "Export": {
         "Name": "sls-dpss-ts-dev-middleware-dev-TokenRefreshLambdaFunctionQualifiedArn"

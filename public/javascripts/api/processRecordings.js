@@ -389,7 +389,7 @@ async function uploadFile(filePath, caseNumber, caseUUID, firstName, lastName, t
   };
 
   try {
-    logger.info('Uploading file to CalSAWS', { filePath, caseNumber });
+    logger.info('Uploading file to CalSAWS', { filePath, caseNumber } + JSON.stringify(infoData));
     const response = await axios.request(config);
     logger.info('File uploaded successfully', { status: response.status, data: response.data });
     return response.data;
