@@ -1,70 +1,129 @@
 /**
- * Audio converter using ffmpeg Lambda layer.
- * Handles Webex's 8kHz 8-bit µ-law (ulaw) WAV → MP3.
+ * Audio converter - pure JavaScript, no native binaries required.
+ * Handles Webex's 8kHz 8-bit µ-law (ulaw) WAV → MP3 using lamejs.
  */
 
-const { execSync } = require('child_process');
 const fs = require('fs');
+const lamejs = require('lamejs');
 const logger = require('../../../log.js');
 
-const FFMPEG_PATH = process.env.FFMPEG_PATH || '/opt/bin/ffmpeg';
+// ITU-T G.711 µ-law decode: 8-bit ulaw sample → 16-bit linear PCM
+function ulawToLinear(ulawByte) {
+    ulawByte = ~ulawByte & 0xFF;
+    const sign     = ulawByte & 0x80;
+    const exponent = (ulawByte >> 4) & 0x07;
+    const mantissa = ulawByte & 0x0F;
+    let sample = ((mantissa << 3) + 132) << exponent;
+    sample -= 132;
+    return sign ? -sample : sample;
+}
 
 /**
- * Convert a WAV file to MP3 using ffmpeg.
- * Works with any WAV encoding including 8-bit µ-law from Webex.
+ * Parse WAV header and return audio metadata + raw sample data.
+ */
+function parseWav(buffer) {
+    if (buffer.toString('ascii', 0, 4) !== 'RIFF' ||
+        buffer.toString('ascii', 8, 12) !== 'WAVE') {
+        throw new Error('Not a valid WAV file');
+    }
+
+    let offset = 12;
+    let audioFormat, channels, sampleRate, bitsPerSample;
+    let dataOffset, dataSize;
+
+    while (offset < buffer.length - 8) {
+        const chunkId   = buffer.toString('ascii', offset, offset + 4);
+        const chunkSize = buffer.readUInt32LE(offset + 4);
+
+        if (chunkId === 'fmt ') {
+            audioFormat  = buffer.readUInt16LE(offset + 8);  // 1=PCM, 7=ulaw
+            channels     = buffer.readUInt16LE(offset + 10);
+            sampleRate   = buffer.readUInt32LE(offset + 12);
+            bitsPerSample = buffer.readUInt16LE(offset + 22);
+        } else if (chunkId === 'data') {
+            dataOffset = offset + 8;
+            dataSize   = chunkSize;
+            break;
+        }
+
+        offset += 8 + chunkSize + (chunkSize % 2); // pad odd-size chunks
+    }
+
+    if (!dataOffset) throw new Error('No data chunk found in WAV file');
+
+    logger.info('WAV parsed', { audioFormat, channels, sampleRate, bitsPerSample, dataSize });
+
+    return {
+        audioFormat,   // 1 = PCM, 7 = µ-law
+        channels,
+        sampleRate,
+        bitsPerSample,
+        data: buffer.slice(dataOffset, dataOffset + dataSize)
+    };
+}
+
+/**
+ * Convert WAV file (PCM or µ-law) to MP3.
  *
- * @param {string} inputPath  - Source WAV file path
- * @param {string} outputPath - Destination MP3 file path
- * @param {Object} options    - { targetSampleRate, targetChannels }
+ * @param {string} inputPath
+ * @param {string} outputPath
+ * @param {Object} options - { targetSampleRate, targetChannels }
  */
 async function convertWavFileToMp3(inputPath, outputPath, options = {}) {
-    const {
-        targetSampleRate = 8000,
-        targetChannels = 1
-    } = options;
+    const { targetSampleRate = 8000, targetChannels = 1 } = options;
 
-    logger.info('Converting WAV to MP3 via ffmpeg', { inputPath, outputPath, targetSampleRate, targetChannels });
+    logger.info('Converting WAV to MP3', { inputPath, outputPath });
 
-    if (!fs.existsSync(inputPath)) {
-        throw new Error(`Input file not found: ${inputPath}`);
+    const wavBuffer = fs.readFileSync(inputPath);
+    const wav = parseWav(wavBuffer);
+
+    // Decode samples to 16-bit PCM Int16Array
+    let pcmSamples;
+
+    if (wav.audioFormat === 7) {
+        // µ-law encoded — decode each byte to 16-bit linear PCM
+        logger.info('Decoding µ-law (ulaw) audio');
+        pcmSamples = new Int16Array(wav.data.length);
+        for (let i = 0; i < wav.data.length; i++) {
+            pcmSamples[i] = ulawToLinear(wav.data[i]);
+        }
+    } else if (wav.audioFormat === 1 && wav.bitsPerSample === 16) {
+        // Standard 16-bit PCM
+        pcmSamples = new Int16Array(wav.data.buffer, wav.data.byteOffset, wav.data.length / 2);
+    } else if (wav.audioFormat === 1 && wav.bitsPerSample === 8) {
+        // 8-bit unsigned PCM — convert to 16-bit signed
+        pcmSamples = new Int16Array(wav.data.length);
+        for (let i = 0; i < wav.data.length; i++) {
+            pcmSamples[i] = (wav.data[i] - 128) * 256;
+        }
+    } else {
+        throw new Error(`Unsupported WAV format: audioFormat=${wav.audioFormat} bitsPerSample=${wav.bitsPerSample}`);
     }
 
-    // -y        overwrite output without prompting
-    // -i        input file
-    // -ac       output channels (1 = mono)
-    // -ar       output sample rate
-    // -b:a 32k  bitrate suitable for voice
-    // -loglevel error  suppress ffmpeg banner noise in logs
-    const cmd = `"${FFMPEG_PATH}" -y -i "${inputPath}" -ac ${targetChannels} -ar ${targetSampleRate} -b:a 32k -loglevel error "${outputPath}"`;
+    // Encode to MP3 using lamejs
+    const mp3encoder = new lamejs.Mp3Encoder(targetChannels, targetSampleRate, 32);
+    const mp3chunks  = [];
+    const frameSize  = 1152; // lamejs frame size
 
-    try {
-        execSync(cmd, { stdio: 'pipe' });
-    } catch (err) {
-        const stderr = err.stderr ? err.stderr.toString() : err.message;
-        logger.error('ffmpeg conversion failed', { cmd, stderr });
-        throw new Error(`ffmpeg conversion failed: ${stderr}`);
+    for (let i = 0; i < pcmSamples.length; i += frameSize) {
+        const frame  = pcmSamples.subarray(i, i + frameSize);
+        const encoded = mp3encoder.encodeBuffer(frame);
+        if (encoded.length > 0) mp3chunks.push(Buffer.from(encoded));
     }
 
-    if (!fs.existsSync(outputPath)) {
-        throw new Error('ffmpeg ran but output file was not created');
-    }
+    const flushed = mp3encoder.flush();
+    if (flushed.length > 0) mp3chunks.push(Buffer.from(flushed));
 
-    const size = fs.statSync(outputPath).size;
-    if (size === 0) {
-        throw new Error('ffmpeg produced an empty output file');
-    }
+    const mp3Buffer = Buffer.concat(mp3chunks);
 
-    logger.info('MP3 conversion complete', { outputPath, size });
+    if (mp3Buffer.length === 0) throw new Error('MP3 encoder produced empty output');
+
+    fs.writeFileSync(outputPath, mp3Buffer);
+    logger.info('MP3 conversion complete', { outputPath, size: mp3Buffer.length });
 }
 
 function isNativeConversionAvailable() {
-    try {
-        execSync(`"${FFMPEG_PATH}" -version`, { stdio: 'pipe' });
-        return true;
-    } catch {
-        logger.warn('ffmpeg not found at ' + FFMPEG_PATH);
-        return false;
-    }
+    return true; // Pure JS — always available
 }
 
 module.exports = { convertWavFileToMp3, isNativeConversionAvailable };

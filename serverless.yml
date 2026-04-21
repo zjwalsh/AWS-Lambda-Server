@@ -52,8 +52,8 @@ provider:
       allowCredentials: false
       maxAge: 3600
   
-  layers:
-    - ${self:custom.ffmpegLayer.${self:provider.region}, self:custom.ffmpegLayer.default}
+  # layers:
+  #   - ${self:custom.ffmpegLayer.${self:provider.region}, self:custom.ffmpegLayer.default}
   
   # IAM Role for Lambda - Version 4 Syntax
   iam:
