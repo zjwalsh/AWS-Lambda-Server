@@ -369,7 +369,8 @@ async function uploadFile(filePath, caseNumber, caseUUID, firstName, lastName, t
         { name: "Document Scope", value: "case" },
         { name: "Capture Information", value: "Telephonic Signature" },
         { name: "Time Sensitive", value: "false" },
-        { name: "Confidential", value: "false" }
+        { name: "Confidential", value: "false" },
+        { name: "drawer", value: "Los Angeles Case" }
       ]
     }
   };
