@@ -4,8 +4,17 @@
  */
 
 const fs = require('fs');
-const lamejs = require('@breezystack/lamejs');
 const logger = require('../../../log.js');
+
+// @breezystack/lamejs is an ES module — must use dynamic import()
+let _Mp3Encoder = null;
+async function getMp3Encoder() {
+    if (!_Mp3Encoder) {
+        const mod = await import('@breezystack/lamejs');
+        _Mp3Encoder = (mod.default || mod).Mp3Encoder;
+    }
+    return _Mp3Encoder;
+}
 
 // ITU-T G.711 µ-law decode: 8-bit ulaw sample → 16-bit linear PCM
 function ulawToLinear(ulawByte) {
@@ -101,7 +110,8 @@ async function convertWavFileToMp3(inputPath, outputPath, options = {}) {
     }
 
     // Encode to MP3 using lamejs
-    const mp3encoder = new lamejs.Mp3Encoder(targetChannels, targetSampleRate, 32);
+    const Mp3Encoder = await getMp3Encoder();
+    const mp3encoder = new Mp3Encoder(targetChannels, targetSampleRate, 32);
     const mp3chunks  = [];
     const frameSize  = 1152; // lamejs frame size
 

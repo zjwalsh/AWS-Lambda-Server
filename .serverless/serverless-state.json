@@ -202,7 +202,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-                "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776783661853-2026-04-21T15:01:01.853Z/dpss-ts-dev-middleware.zip"
+                "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776784055463-2026-04-21T15:07:35.463Z/dpss-ts-dev-middleware.zip"
               },
               "Handler": "lambda.handler",
               "Runtime": "nodejs22.x",
@@ -261,7 +261,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-                "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776783661853-2026-04-21T15:01:01.853Z/dpss-ts-dev-middleware.zip"
+                "S3Key": "serverless/dpss-ts-dev-middleware/dev/1776784055463-2026-04-21T15:07:35.463Z/dpss-ts-dev-middleware.zip"
               },
               "Handler": "token-refresh.handler",
               "Runtime": "nodejs22.x",
@@ -316,24 +316,24 @@
               "TokenRefreshLogGroup"
             ]
           },
-          "ApiLambdaVersionsdjvaRg2wwpYB59ks3vh8x43U1aSjNv5s0RgVEt0": {
+          "ApiLambdaVersionN2aWdvWfQ8f5JbhXDDPplScTWG4vOGwTIk4Z8GgG1s": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "le3975JbA93wSlSuoaYxD86ZN0pCqEfiUe2kgw34rcw="
+              "CodeSha256": "XsB7LNngB/VLgtrY9UxGUcHQy1Pu9HokJrsPW7YwBiI="
             }
           },
-          "TokenRefreshLambdaVersionqr3FRQNvbBjELRHADxXVbkYPvyXLHsWa8C0uormkrQ": {
+          "TokenRefreshLambdaVersionnoSXFAldGf2ZAY9deQbM2LSSkNLrjt4PMWXf5kcyks": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "TokenRefreshLambdaFunction"
               },
-              "CodeSha256": "le3975JbA93wSlSuoaYxD86ZN0pCqEfiUe2kgw34rcw=",
+              "CodeSha256": "XsB7LNngB/VLgtrY9UxGUcHQy1Pu9HokJrsPW7YwBiI=",
               "Description": "Refreshes WX and CA tokens periodically"
             }
           },
@@ -903,7 +903,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersionsdjvaRg2wwpYB59ks3vh8x43U1aSjNv5s0RgVEt0"
+              "Ref": "ApiLambdaVersionN2aWdvWfQ8f5JbhXDDPplScTWG4vOGwTIk4Z8GgG1s"
             },
             "Export": {
               "Name": "sls-dpss-ts-dev-middleware-dev-ApiLambdaFunctionQualifiedArn"
@@ -912,7 +912,7 @@
           "TokenRefreshLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "TokenRefreshLambdaVersionqr3FRQNvbBjELRHADxXVbkYPvyXLHsWa8C0uormkrQ"
+              "Ref": "TokenRefreshLambdaVersionnoSXFAldGf2ZAY9deQbM2LSSkNLrjt4PMWXf5kcyks"
             },
             "Export": {
               "Name": "sls-dpss-ts-dev-middleware-dev-TokenRefreshLambdaFunctionQualifiedArn"
@@ -1112,7 +1112,7 @@
         "memory": 1024,
         "runtime": "nodejs22.x",
         "vpc": {},
-        "versionLogicalId": "ApiLambdaVersionsdjvaRg2wwpYB59ks3vh8x43U1aSjNv5s0RgVEt0"
+        "versionLogicalId": "ApiLambdaVersionN2aWdvWfQ8f5JbhXDDPplScTWG4vOGwTIk4Z8GgG1s"
       },
       "tokenRefresh": {
         "handler": "token-refresh.handler",
@@ -1135,7 +1135,7 @@
         "memory": 256,
         "runtime": "nodejs22.x",
         "vpc": {},
-        "versionLogicalId": "TokenRefreshLambdaVersionqr3FRQNvbBjELRHADxXVbkYPvyXLHsWa8C0uormkrQ"
+        "versionLogicalId": "TokenRefreshLambdaVersionnoSXFAldGf2ZAY9deQbM2LSSkNLrjt4PMWXf5kcyks"
       }
     },
     "resources": {
@@ -1339,7 +1339,7 @@
         "artifactsS3KeyDirname": "serverless/dpss-ts-dev-middleware/dev/code-artifacts",
         "deploymentBucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
         "artifact": "C:\\Projects\\TS-Middleware\\server\\.serverless\\dpss-ts-dev-middleware.zip",
-        "artifactDirectoryName": "serverless/dpss-ts-dev-middleware/dev/1776783661853-2026-04-21T15:01:01.853Z"
+        "artifactDirectoryName": "serverless/dpss-ts-dev-middleware/dev/1776784055463-2026-04-21T15:07:35.463Z"
       },
       "provider": {
         "$ref": "$[\"service\"][\"provider\"]"
@@ -1360,7 +1360,7 @@
     "artifact": "C:\\Projects\\TS-Middleware\\server\\.serverless\\dpss-ts-dev-middleware.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/dpss-ts-dev-middleware/dev/1776783661853-2026-04-21T15:01:01.853Z",
+    "artifactDirectoryName": "serverless/dpss-ts-dev-middleware/dev/1776784055463-2026-04-21T15:07:35.463Z",
     "artifact": "dpss-ts-dev-middleware.zip"
   }
 }
