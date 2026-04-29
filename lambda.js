@@ -326,16 +326,9 @@ async function routeTelephonicSignature(req, res, path, method) {
             return;
         }
 
-        if (!metadata.appNumber || !metadata.caseNumber || !metadata.reason) {
-            logger.warn(`Rejecting pauseResume request missing required form fields for taskId: ${taskId}`, {
-                hasAppNumber: !!metadata.appNumber,
-                hasCaseNumber: !!metadata.caseNumber,
-                hasReason: !!metadata.reason
-            });
-            res.status(400).json({
-                success: false,
-                error: 'appNumber and caseNumber and reason are required '
-            });
+        if (!metadata.reason) {
+            logger.warn(`Rejecting pauseResume request missing reason for taskId: ${taskId}`);
+            res.status(400).json({ success: false, error: 'reason is required' });
             return;
         }
 
@@ -355,6 +348,15 @@ async function routeTelephonicSignature(req, res, path, method) {
         }
 
         // Start Recording — send pause/resume and write a DB record
+        if (!metadata.appNumber || !metadata.caseNumber) {
+            logger.warn(`Rejecting Start Recording request missing form fields for taskId: ${taskId}`, {
+                hasAppNumber: !!metadata.appNumber,
+                hasCaseNumber: !!metadata.caseNumber
+            });
+            res.status(400).json({ success: false, error: 'appNumber and caseNumber are required for Start Recording' });
+            return;
+        }
+
         const pairIndex = await countRecordsByTaskId(taskId);
         logger.debug(`pairIndex for taskId ${taskId}: ${pairIndex}`);
 
