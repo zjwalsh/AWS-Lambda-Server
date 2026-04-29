@@ -3,7 +3,7 @@
  */
 
 const axios = require("axios");
-const { getWXAccessToken } = require('../api/wxccTokenService.js')
+const { getWXAccessToken, getWXRefreshToken, wxDeleteAll } = require('../api/wxccTokenService.js')
 const { findSubscription, deleteSubscription } = require('../db/subscriptionDb.js');
 var logger = require('../../../log.js');
 var curModual = " - api.js - "
@@ -14,17 +14,15 @@ var curModual = " - api.js - "
  * @async
  * @returns {string}
  */
-const sendPauseResume = async (taskId) => {
+const sendPauseResume = async (taskId, isRetry = false) => {
   try {
-    logger.info(curModual + "sendPauseResume - Sending Pause/Resume Command to WebEx for taskId " + taskId);
+    logger.info(curModual + "sendPauseResume - Sending Pause/Resume Command to WebEx for taskId " + taskId + (isRetry ? ' (retry after token refresh)' : ''));
     const accessToken = await getWXAccessToken();
     if (accessToken == null) {
       logger.warn(curModual + "sendPauseResume - No Access Token");
       return null;
     }
 
-    // Send the Pause Resume commands to Webexcc
-    logger.info(curModual + "sendPauseResume - Sending Pause/Resume Command to WebEx");
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -40,24 +38,34 @@ const sendPauseResume = async (taskId) => {
       const pauseResponse = await axios.request(url, config);
       logger.debug("Webex Response to Pause: " + JSON.stringify(pauseResponse.data));
     } catch (error) {
+      if (error.response?.status === 401 && !isRetry) {
+        logger.warn(curModual + "sendPauseResume - Pause 401, refreshing WX token and retrying...");
+        await wxDeleteAll();
+        await getWXRefreshToken();
+        return sendPauseResume(taskId, true);
+      }
       logger.error("Pause returned error: " + error.message);
       return null;
     }
 
-    //Send the Resume command
+    // Send the Resume command
     url = 'https://api.wxcc-us1.cisco.com/v1/tasks/' + taskId + '/record/resume';
     try {
       const resumeResponse = await axios.request(url, config);
       logger.debug("Webex Response to Resume: " + JSON.stringify(resumeResponse.data));
-      
-      // Capture Cisco's server time from the response headers to align with segment timestamps
+
       const ciscoDate = resumeResponse.headers.date;
       const ciscoTimestamp = ciscoDate ? new Date(ciscoDate).getTime() : Date.now();
-      
+
       logger.info(curModual + `sendPauseResume - Success for taskId ${taskId}. Cisco Time: ${ciscoTimestamp}`);
-      
       return { success: true, timestamp: ciscoTimestamp };
     } catch (error) {
+      if (error.response?.status === 401 && !isRetry) {
+        logger.warn(curModual + "sendPauseResume - Resume 401, refreshing WX token and retrying...");
+        await wxDeleteAll();
+        await getWXRefreshToken();
+        return sendPauseResume(taskId, true);
+      }
       logger.error("Resume returned error: " + error.message);
       return null;
     }
