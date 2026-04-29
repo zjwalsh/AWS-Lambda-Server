@@ -333,7 +333,7 @@ async function routeTelephonicSignature(req, res, path, method) {
             });
             res.status(400).json({
                 success: false,
-                error: 'appNumber and caseNumber are required'
+                error: 'appNumber and caseNumber and reason are required '
             });
             return;
         }
