@@ -329,7 +329,8 @@ async function routeTelephonicSignature(req, res, path, method) {
         if (!metadata.appNumber || !metadata.caseNumber || !metadata.reason) {
             logger.warn(`Rejecting pauseResume request missing required form fields for taskId: ${taskId}`, {
                 hasAppNumber: !!metadata.appNumber,
-                hasCaseNumber: !!metadata.caseNumber
+                hasCaseNumber: !!metadata.caseNumber,
+                hasReason: !!metadata.reason
             });
             res.status(400).json({
                 success: false,
