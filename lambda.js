@@ -339,15 +339,26 @@ async function routeTelephonicSignature(req, res, path, method) {
             return;
         }
 
-        logger.info(`Processing TS request for taskId: ${taskId}`);
+        logger.info(`Processing TS request for taskId: ${taskId} reason: ${metadata.reason}`);
 
-        // Determine which pair this is within the call (0-based)
+        // Stop Recording — send pause/resume to Webex to close the segment but do not write a DB record
+        if (metadata.reason === 'Stop Recording') {
+            logger.info(`Stop Recording request for taskId: ${taskId} - sending pause/resume without DB record`);
+            const sendResponse = await sendPauseResume(taskId);
+            if (!sendResponse) {
+                logger.error(`Failed to send Stop Recording pause/resume for taskId: ${taskId}`);
+                res.status(500).json({ success: false, error: 'Failed to send pause/resume command to Webex' });
+                return;
+            }
+            res.status(200).json({ success: true, message: 'Stop Recording processed', taskId });
+            return;
+        }
+
+        // Start Recording — send pause/resume and write a DB record
         const pairIndex = await countRecordsByTaskId(taskId);
         logger.debug(`pairIndex for taskId ${taskId}: ${pairIndex}`);
 
-        // Create a record with local time as a fallback; will be updated after the API call
         const pauseSentAtMs = Date.now();
-        // Create a new record for this pause/resume pair
         const recordId = await createAgentRecord({ ...metadata, taskId, pauseSentAtMs }, pairIndex);
 
         if (!recordId) {
@@ -371,7 +382,6 @@ async function routeTelephonicSignature(req, res, path, method) {
             return;
         }
 
-        // Update the record with the precise Cisco server timestamp for perfect segment matching
         await updateRecordTimestamp(taskId, recordId, sendResponse.timestamp);
 
         logger.info(`Successfully sent pause/resume for taskId: ${taskId} pairIndex: ${pairIndex}`);

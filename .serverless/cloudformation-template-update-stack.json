@@ -118,7 +118,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1777498337881-2026-04-29T21:32:17.881Z/dpss-ts-dev-middleware.zip"
+          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1777498713911-2026-04-29T21:38:33.911Z/dpss-ts-dev-middleware.zip"
         },
         "Handler": "lambda.handler",
         "Runtime": "nodejs22.x",
@@ -177,7 +177,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-us-west-2-c0b572c0-1eb3",
-          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1777498337881-2026-04-29T21:32:17.881Z/dpss-ts-dev-middleware.zip"
+          "S3Key": "serverless/dpss-ts-dev-middleware/dev/1777498713911-2026-04-29T21:38:33.911Z/dpss-ts-dev-middleware.zip"
         },
         "Handler": "token-refresh.handler",
         "Runtime": "nodejs22.x",
@@ -232,24 +232,24 @@
         "TokenRefreshLogGroup"
       ]
     },
-    "ApiLambdaVersionSST3uHExPQ5SuohSMsGHnxGROwrYskCWL4HM0cGLU": {
+    "ApiLambdaVersionYBuPohGcdRUXKWo619AIZlqoXCgB65Vc7hXOh5ZUlk": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "ApiLambdaFunction"
         },
-        "CodeSha256": "ShOOvuzJm00YZCHyU4cG8Cr2cNo+rd2tcuDml2Ch7Ik="
+        "CodeSha256": "v95VWi18SRFoXCsZ5OJq+xQXKRpEOm+FJk6AToZrUz4="
       }
     },
-    "TokenRefreshLambdaVersionf15YpdgAxuqrb2eXxtbMDLi2MFRpxdjqqr9LFG0Qhzc": {
+    "TokenRefreshLambdaVersion7tEUUBrrfb7IcFdMO4mPIkLF2Qa19uYg3NA5bq510s0": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "TokenRefreshLambdaFunction"
         },
-        "CodeSha256": "ShOOvuzJm00YZCHyU4cG8Cr2cNo+rd2tcuDml2Ch7Ik=",
+        "CodeSha256": "v95VWi18SRFoXCsZ5OJq+xQXKRpEOm+FJk6AToZrUz4=",
         "Description": "Refreshes WX and CA tokens periodically"
       }
     },
@@ -822,7 +822,7 @@
     "ApiLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "ApiLambdaVersionSST3uHExPQ5SuohSMsGHnxGROwrYskCWL4HM0cGLU"
+        "Ref": "ApiLambdaVersionYBuPohGcdRUXKWo619AIZlqoXCgB65Vc7hXOh5ZUlk"
       },
       "Export": {
         "Name": "sls-dpss-ts-dev-middleware-dev-ApiLambdaFunctionQualifiedArn"
@@ -831,7 +831,7 @@
     "TokenRefreshLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "TokenRefreshLambdaVersionf15YpdgAxuqrb2eXxtbMDLi2MFRpxdjqqr9LFG0Qhzc"
+        "Ref": "TokenRefreshLambdaVersion7tEUUBrrfb7IcFdMO4mPIkLF2Qa19uYg3NA5bq510s0"
       },
       "Export": {
         "Name": "sls-dpss-ts-dev-middleware-dev-TokenRefreshLambdaFunctionQualifiedArn"
