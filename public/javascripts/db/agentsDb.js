@@ -295,7 +295,7 @@ const getRecordsByDateRange = async (startDate, endDate) => {
     do {
       const params = {
         TableName: TABLES.AGENTS,
-        FilterExpression: 'createdAt BETWEEN :start AND :end AND attribute_exists(documentumid) AND attribute_exists(caseUUID) AND attribute_exists(appNumber)',
+        FilterExpression: 'createdAt BETWEEN :start AND :end AND attribute_exists(appNumber)',
         ExpressionAttributeValues: { ':start': start, ':end': end },
         ...(lastEvaluatedKey && { ExclusiveStartKey: lastEvaluatedKey })
       };
